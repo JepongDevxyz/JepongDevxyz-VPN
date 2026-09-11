@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/android30-emulator-export.yml'
 
+# Install-verification runtime export; source tree is not modified by this job.
 jobs:
   export-runtime:
     runs-on: ubuntu-latest
