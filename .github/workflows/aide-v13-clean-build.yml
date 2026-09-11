@@ -29,6 +29,30 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager 'platforms;android-30' 'build-tools;30.0.3'
 
+      - name: Stage Android 30 verification toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf android30-toolchain
+          mkdir -p android30-toolchain/platforms/android-30 android30-toolchain/build-tools/30.0.3
+          cp "$ANDROID_HOME/platforms/android-30/android.jar" android30-toolchain/platforms/android-30/
+          for f in aapt aapt2 aidl d8 dx apksigner zipalign; do
+            if [ -e "$ANDROID_HOME/build-tools/30.0.3/$f" ]; then
+              cp -a "$ANDROID_HOME/build-tools/30.0.3/$f" android30-toolchain/build-tools/30.0.3/
+            fi
+          done
+          cp -a "$ANDROID_HOME/build-tools/30.0.3/lib" android30-toolchain/build-tools/30.0.3/
+          cp -a "$ANDROID_HOME/build-tools/30.0.3/lib64" android30-toolchain/build-tools/30.0.3/ 2>/dev/null || true
+          find android30-toolchain -type f -maxdepth 5 -print
+
+      - name: Upload Android 30 verification toolchain
+        uses: actions/upload-artifact@v4
+        with:
+          name: android30-verification-toolchain
+          path: android30-toolchain
+          if-no-files-found: error
+          compression-level: 6
+
       - name: Verify classic AIDE project layout
         shell: bash
         run: |
