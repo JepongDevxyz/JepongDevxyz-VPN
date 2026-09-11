@@ -23,24 +23,25 @@ jobs:
           set -euo pipefail
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager 'platform-tools' 'emulator' 'system-images;android-30;google_apis;x86_64'
-      - name: Stage emulator runtime
+      - name: Stage and compress emulator runtime
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf android30-emulator-runtime
+          rm -rf android30-emulator-runtime android30-emulator-runtime.tar.zst
           mkdir -p android30-emulator-runtime
           cp -a "$ANDROID_HOME/emulator" android30-emulator-runtime/
           cp -a "$ANDROID_HOME/platform-tools" android30-emulator-runtime/
           mkdir -p android30-emulator-runtime/system-images/android-30/google_apis
           cp -a "$ANDROID_HOME/system-images/android-30/google_apis/x86_64" android30-emulator-runtime/system-images/android-30/google_apis/
           du -sh android30-emulator-runtime
-          "$ANDROID_HOME/emulator/emulator" -version | head -5
           "$ANDROID_HOME/platform-tools/adb" version
+          tar -S --use-compress-program='zstd -3 -T0' -cf android30-emulator-runtime.tar.zst android30-emulator-runtime
+          ls -lh android30-emulator-runtime.tar.zst
       - name: Upload emulator runtime
         uses: actions/upload-artifact@v4
         with:
           name: android30-googleapis-x86_64-emulator-runtime
-          path: android30-emulator-runtime
+          path: android30-emulator-runtime.tar.zst
           if-no-files-found: error
           compression-level: 0
           retention-days: 3
