@@ -1,0 +1,45 @@
+name: Export Android 30 Emulator Runtime
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - aide-v13-fresh-build-verify
+    paths:
+      - '.github/workflows/android30-emulator-export.yml'
+
+jobs:
+  export-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install API 30 emulator runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'emulator' 'system-images;android-30;google_apis;x86_64'
+      - name: Stage emulator runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf android30-emulator-runtime
+          mkdir -p android30-emulator-runtime
+          cp -a "$ANDROID_HOME/emulator" android30-emulator-runtime/
+          cp -a "$ANDROID_HOME/platform-tools" android30-emulator-runtime/
+          mkdir -p android30-emulator-runtime/system-images/android-30/google_apis
+          cp -a "$ANDROID_HOME/system-images/android-30/google_apis/x86_64" android30-emulator-runtime/system-images/android-30/google_apis/
+          du -sh android30-emulator-runtime
+          "$ANDROID_HOME/emulator/emulator" -version | head -5
+          "$ANDROID_HOME/platform-tools/adb" version
+      - name: Upload emulator runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: android30-googleapis-x86_64-emulator-runtime
+          path: android30-emulator-runtime
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
