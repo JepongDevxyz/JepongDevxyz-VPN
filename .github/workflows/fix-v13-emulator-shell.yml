@@ -1,0 +1,51 @@
+name: Fix V13 Emulator Shell
+
+on:
+  push:
+    branches:
+      - aide-v13-fresh-build-verify
+    paths:
+      - '.github/workflows/fix-v13-emulator-shell.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verification branch
+        uses: actions/checkout@v4
+        with:
+          ref: aide-v13-fresh-build-verify
+          fetch-depth: 0
+
+      - name: Apply minimal POSIX sh fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('.github/workflows/v13-end-to-end-verify.yml')
+          text = p.read_text(encoding='utf-8')
+          old = "          script: |\n            set -euo pipefail\n"
+          new = "          script: |\n            set -eu\n"
+          count = text.count(old)
+          if count != 1:
+              raise SystemExit(f'Expected exactly one emulator script shell header, found {count}')
+          p.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+          git diff --check
+          git diff -- .github/workflows/v13-end-to-end-verify.yml
+          grep -A2 -F 'script: |' .github/workflows/v13-end-to-end-verify.yml | head -n3
+
+      - name: Commit verifier fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'JepongDevxyz'
+          git config user.email 'businessdevgithubjepong@gmail.com'
+          git add .github/workflows/v13-end-to-end-verify.yml
+          git diff --cached --quiet && { echo 'No change to commit'; exit 1; }
+          git commit -m 'ci: run emulator verification script with POSIX sh'
+          git push origin HEAD:aide-v13-fresh-build-verify
