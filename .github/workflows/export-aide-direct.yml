@@ -73,5 +73,5 @@ jobs:
           path: ${{ runner.temp }}/JepongDevxyz-VPN-AIDE-V13-Verified/
           include-hidden-files: true
           if-no-files-found: error
-          compression-level: 0
+          compression-level: 6
           retention-days: 14
