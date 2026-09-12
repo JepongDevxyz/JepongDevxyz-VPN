@@ -1,0 +1,77 @@
+name: Export Direct AIDE Project
+
+on:
+  push:
+    branches:
+      - aide-v13-fresh-build-verify
+    paths:
+      - '.github/aide-export-trigger.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verified main source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Validate verified AIDE project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .project
+          test -f .classpath
+          test -f AndroidManifest.xml
+          test -f project.properties
+          test -d src
+          test -d res
+          test -d assets
+          test -d libs
+          test -d gen
+          grep -q '^target=android-30$' project.properties
+          echo 'AIDE_PROJECT_STRUCTURE=PASS'
+
+      - name: Stage clean direct AIDE project
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE="$RUNNER_TEMP/JepongDevxyz-VPN-AIDE-V13-Verified"
+          mkdir -p "$STAGE"
+          rsync -a ./ "$STAGE/" \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='build/' \
+            --exclude='bin/' \
+            --exclude='.verify-build/' \
+            --exclude='FRESH-BUILD-VERIFICATION.txt' \
+            --exclude='V11-VERIFICATION.txt' \
+            --exclude='V12-VERIFICATION.txt' \
+            --exclude='V12-CHANGES.txt' \
+            --exclude='V13-ROOT-CAUSE.txt'
+          test -f "$STAGE/.project"
+          test -f "$STAGE/.classpath"
+          test -f "$STAGE/AndroidManifest.xml"
+          test -f "$STAGE/project.properties"
+          test -d "$STAGE/src"
+          test -d "$STAGE/res"
+          test -d "$STAGE/assets"
+          test -d "$STAGE/libs"
+          test -d "$STAGE/gen"
+          echo 'DIRECT_AIDE_STAGE=PASS'
+
+      - name: Upload direct AIDE project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: JepongDevxyz-VPN-AIDE-V13-Direct-Project
+          path: ${{ runner.temp }}/JepongDevxyz-VPN-AIDE-V13-Verified/
+          include-hidden-files: true
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
