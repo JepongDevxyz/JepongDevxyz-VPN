@@ -1,0 +1,46 @@
+name: V13 Source NPE Diagnostic
+
+on:
+  push:
+    branches:
+      - aide-v13-fresh-build-verify
+    paths:
+      - '.github/v13-source-diagnose-url.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: aide-v13-fresh-build-verify
+      - name: Download exact V13 and inspect crash line
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="$(tr -d '\r\n' < .github/v13-source-diagnose-url.txt)"
+          case "$URL" in https://*) ;; *) echo 'URL must be HTTPS' >&2; exit 1;; esac
+          rm -rf /tmp/v13diag /tmp/v13diag.zip
+          curl -fL --retry 2 "$URL" -o /tmp/v13diag.zip
+          mkdir -p /tmp/v13diag
+          unzip -q /tmp/v13diag.zip -d /tmp/v13diag
+          MAIN="$(find /tmp/v13diag -type f -path '*/src/com/jepongdevxyz/vpn/MainActivity.java' -print -quit)"
+          test -n "$MAIN"
+          ROOT="$(dirname "$(dirname "$(dirname "$(dirname "$(dirname "$MAIN")")")")")"
+          echo "MAIN=$MAIN"
+          echo '=== MainActivity.java 810-855 ==='
+          nl -ba "$MAIN" | sed -n '810,855p'
+          echo '=== findViewById near doDrawerMain ==='
+          sed -n '760,870p' "$MAIN" | grep -n -E 'findViewById|setText|doDrawerMain|TextView' || true
+          echo '=== candidate IDs in resources ==='
+          IDS=$(sed -n '810,855p' "$MAIN" | grep -oE 'R\.id\.[A-Za-z0-9_]+' | sed 's/R\.id\.//' | sort -u || true)
+          printf '%s\n' "$IDS"
+          for id in $IDS; do
+            echo "--- ID: $id ---"
+            grep -R -n --include='*.xml' -E "@\+?id/$id([\"'[:space:]>]|$)" /tmp/v13diag | head -n 20 || true
+          done
