@@ -174,6 +174,27 @@ jobs:
         run: |
           echo '=== package-fatal.txt ==='
           cat "$PROJECT_DIR/build/package-fatal.txt" || true
+          echo '=== deep FATAL context from full logcat ==='
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p = Path(os.environ['PROJECT_DIR']) / 'build' / 'logcat.txt'
+          if p.exists():
+              lines = p.read_text(errors='replace').splitlines()
+              hits = [i for i, line in enumerate(lines) if 'FATAL EXCEPTION' in line]
+              if not hits:
+                  print('No FATAL EXCEPTION line found in logcat.txt')
+              for n, i in enumerate(hits[:3], 1):
+                  print(f'--- FATAL BLOCK {n} ---')
+                  for line in lines[max(0, i-5):min(len(lines), i+140)]:
+                      print(line)
+          else:
+              print('logcat.txt missing')
+          PY
+          echo '=== activity_about.xml lines 105-145 ==='
+          nl -ba "$PROJECT_DIR/res/layout/activity_about.xml" | sed -n '105,145p' || true
+          echo '=== activity_main_drawer.xml lines 80-110 ==='
+          nl -ba "$PROJECT_DIR/res/layout/activity_main_drawer.xml" | sed -n '80,110p' || true
           echo '=== launch.txt ==='
           cat "$PROJECT_DIR/build/launch.txt" || true
           echo '=== adb-install.txt ==='
