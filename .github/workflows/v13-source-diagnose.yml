@@ -31,7 +31,6 @@ jobs:
           unzip -q /tmp/v13diag.zip -d /tmp/v13diag
           MAIN="$(find /tmp/v13diag -type f -path '*/src/com/jepongdevxyz/vpn/MainActivity.java' -print -quit)"
           test -n "$MAIN"
-          ROOT="$(dirname "$(dirname "$(dirname "$(dirname "$(dirname "$MAIN")")")")")"
           echo "MAIN=$MAIN"
           echo '=== MainActivity.java 810-855 ==='
           nl -ba "$MAIN" | sed -n '810,855p'
@@ -44,3 +43,19 @@ jobs:
             echo "--- ID: $id ---"
             grep -R -n --include='*.xml' -E "@\+?id/$id([\"'[:space:]>]|$)" /tmp/v13diag | head -n 20 || true
           done
+          echo '=== nav_header.xml ==='
+          NAV=$(find /tmp/v13diag -type f -path '*/res/layout/nav_header.xml' -print -quit)
+          test -n "$NAV"
+          nl -ba "$NAV" | sed -n '1,140p'
+          echo '=== activity_main_drawer NavigationView area ==='
+          DRAWER=$(find /tmp/v13diag -type f -path '*/res/layout/activity_main_drawer.xml' -print -quit)
+          test -n "$DRAWER"
+          nl -ba "$DRAWER" | sed -n '95,120p'
+          echo '=== NavigationView source candidates ==='
+          find /tmp/v13diag -type f \( -name 'NavigationView.java' -o -name '*NavigationView*.java' \) -print
+          while IFS= read -r f; do
+            echo "--- $f ---"
+            nl -ba "$f" | sed -n '1,260p'
+          done < <(find /tmp/v13diag -type f \( -name 'NavigationView.java' -o -name '*NavigationView*.java' \) -print)
+          echo '=== headerLayout/getHeaderView references ==='
+          grep -R -n --include='*.java' -E 'getHeaderView|headerLayout|inflateHeaderView' /tmp/v13diag | head -n 120 || true
