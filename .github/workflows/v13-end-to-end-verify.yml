@@ -1,0 +1,474 @@
+name: V13 End-to-End Build and Install Verification
+
+on:
+  push:
+    branches:
+      - aide-v13-fresh-build-verify
+    paths:
+      - '.github/workflows/v13-end-to-end-verify.yml'
+      - '.github/v13-baseline-url.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PACKAGE: com.jepongdevxyz.vpn
+      LAUNCHER: com.jepongdevxyz.vpn.activities.SplashActivity
+    steps:
+      - name: Checkout verification branch
+        uses: actions/checkout@v4
+
+      - name: Require temporary baseline URL
+        id: baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL_FILE='.github/v13-baseline-url.txt'
+          if [[ ! -s "$URL_FILE" ]]; then
+            echo 'No temporary baseline URL yet; verification remains pending.'
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          URL="$(tr -d '\r\n' < "$URL_FILE")"
+          case "$URL" in
+            https://*) ;;
+            *) echo 'Baseline URL must be HTTPS.' >&2; exit 1 ;;
+          esac
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 17
+        if: steps.baseline.outputs.ready == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        if: steps.baseline.outputs.ready == 'true'
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 30 build toolchain
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-30' 'build-tools;30.0.3' 'platform-tools'
+          echo "ANDROID_JAR=$ANDROID_HOME/platforms/android-30/android.jar" >> "$GITHUB_ENV"
+          echo "BT=$ANDROID_HOME/build-tools/30.0.3" >> "$GITHUB_ENV"
+
+      - name: Download exact V13 baseline
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        env:
+          BASELINE_URL: ${{ steps.baseline.outputs.url }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            --output "$RUNNER_TEMP/v13-baseline.zip" "$BASELINE_URL"
+          unzip -t "$RUNNER_TEMP/v13-baseline.zip" >/dev/null
+          rm -rf "$RUNNER_TEMP/v13-raw" "$RUNNER_TEMP/v13-project"
+          mkdir -p "$RUNNER_TEMP/v13-raw"
+          unzip -q "$RUNNER_TEMP/v13-baseline.zip" -d "$RUNNER_TEMP/v13-raw"
+          ROOT="$(find "$RUNNER_TEMP/v13-raw" -type f -name AndroidManifest.xml -printf '%h\n' | head -n1)"
+          test -n "$ROOT"
+          cp -a "$ROOT" "$RUNNER_TEMP/v13-project"
+          echo "PROJECT_DIR=$RUNNER_TEMP/v13-project" >> "$GITHUB_ENV"
+          test -f "$RUNNER_TEMP/v13-project/project.properties"
+          grep -qx 'target=android-30' "$RUNNER_TEMP/v13-project/project.properties"
+          echo "Baseline project root: $ROOT"
+
+      - name: Apply deterministic verified-source patches
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+
+          root = Path(os.environ['PROJECT_DIR'])
+
+          def read(rel):
+              return (root / rel).read_text(encoding='utf-8')
+
+          def write(rel, text):
+              p = root / rel
+              p.parent.mkdir(parents=True, exist_ok=True)
+              p.write_text(text, encoding='utf-8')
+
+          def replace_once(rel, old, new):
+              text = read(rel)
+              count = text.count(old)
+              if count < 1:
+                  raise SystemExit(f'{rel}: expected pattern not found: {old!r}')
+              text = text.replace(old, new, 1)
+              write(rel, text)
+
+          def replace_all(rel, old, new, require=True):
+              text = read(rel)
+              count = text.count(old)
+              if require and count < 1:
+                  raise SystemExit(f'{rel}: expected pattern not found: {old!r}')
+              write(rel, text.replace(old, new))
+
+          replace_once('res/values/colors.xml', '    //color toolbar // targetas', '    <!-- color toolbar / targetas -->')
+          replace_once('res/values/strings.xml', '    // Developer url', '    <!-- Developer url -->')
+          replace_once('res/values/style.xml', '        <item name="alertDialogTheme">@style/ThemeOverlay.Material3.MaterialAlertDialog</item>\n', '')
+          replace_once('res/values/style.xml',
+              '        <item name="android:textColorHint">#ffffff</item>\n        <item name="hintTextColor">#ffffff</item>\n        <item name="android:textColorHint">#ffffff</item>',
+              '        <item name="android:textColorHint">#ffffff</item>\n        <item name="hintTextColor">#ffffff</item>')
+          replace_once('res/values-night/themes.xml', '        <item name="alertDialogTheme">@style/ThemeOverlay.Material3.MaterialAlertDialog</item>\n', '')
+
+          replace_all('res/layout/activity_edit_v2ray_config.xml', '?attr/actionBarSize', '?android:attr/actionBarSize')
+          replace_all('res/layout/proxy_settings.xml', '?attr/actionBarSize', '?android:attr/actionBarSize')
+          replace_all('res/layout/payload_generator_dialog.xml', '?dialogPreferredPadding', '?android:attr/dialogPreferredPadding')
+          replace_all('res/layout/dialog_buttom_result_sheet.xml', '@id/cl_download', '@+id/cl_download')
+          replace_all('res/layout/dialog_buttom_result_sheet.xml', '@id/cl_upload', '@+id/cl_upload')
+          replace_all('res/drawable/ic_delete.xml', '@android:color/system_accent1_100', '@color/colorAccent')
+          replace_all('res/values/style.xml', '@android:color/system_accent2_50', '@color/card_view_bg')
+          replace_all('res/values/style.xml', '@android:color/system_accent3_10', '?android:attr/selectableItemBackground')
+          replace_all('res/values/style.xml', '@android:color/system_accent1_500', '?android:attr/selectableItemBackgroundBorderless')
+
+          manifest = read('AndroidManifest.xml')
+          old = '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n    package="com.jepongdevxyz.vpn">'
+          new = '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n    package="com.jepongdevxyz.vpn"\n    android:versionCode="1"\n    android:versionName="1.0">\n\n    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30" />'
+          if old not in manifest:
+              raise SystemExit('AndroidManifest.xml: expected V13 manifest header not found')
+          write('AndroidManifest.xml', manifest.replace(old, new, 1))
+
+          write('src/es/dmoral/toasty/Toasty.java', '''package es.dmoral.toasty;
+
+          import android.content.Context;
+          import android.widget.Toast;
+
+          public class Toasty {
+              public static final int LENGTH_SHORT = Toast.LENGTH_SHORT;
+              public static final int LENGTH_LONG = Toast.LENGTH_LONG;
+              private static Toast t(Context c, CharSequence s, int d) { return Toast.makeText(c, s, d); }
+              private static Toast t(Context c, int resId, int d) { return Toast.makeText(c, resId, d); }
+              public static Toast success(Context c, CharSequence s) { return t(c, s, LENGTH_SHORT); }
+              public static Toast success(Context c, CharSequence s, int d) { return t(c, s, d); }
+              public static Toast success(Context c, CharSequence s, int d, boolean i) { return t(c, s, d); }
+              public static Toast success(Context c, int resId, int d) { return t(c, resId, d); }
+              public static Toast success(Context c, int resId, int d, boolean i) { return t(c, resId, d); }
+              public static Toast error(Context c, CharSequence s) { return t(c, s, LENGTH_SHORT); }
+              public static Toast error(Context c, CharSequence s, int d) { return t(c, s, d); }
+              public static Toast error(Context c, CharSequence s, int d, boolean i) { return t(c, s, d); }
+              public static Toast error(Context c, int resId, int d) { return t(c, resId, d); }
+              public static Toast error(Context c, int resId, int d, boolean i) { return t(c, resId, d); }
+              public static Toast info(Context c, CharSequence s) { return t(c, s, LENGTH_SHORT); }
+              public static Toast info(Context c, CharSequence s, int d) { return t(c, s, d); }
+              public static Toast info(Context c, CharSequence s, int d, boolean i) { return t(c, s, d); }
+              public static Toast info(Context c, int resId, int d) { return t(c, resId, d); }
+              public static Toast info(Context c, int resId, int d, boolean i) { return t(c, resId, d); }
+              public static Toast warning(Context c, CharSequence s) { return t(c, s, LENGTH_SHORT); }
+              public static Toast warning(Context c, CharSequence s, int d) { return t(c, s, d); }
+              public static Toast warning(Context c, CharSequence s, int d, boolean i) { return t(c, s, d); }
+              public static Toast warning(Context c, int resId, int d) { return t(c, resId, d); }
+              public static Toast warning(Context c, int resId, int d, boolean i) { return t(c, resId, d); }
+              public static Toast normal(Context c, CharSequence s) { return t(c, s, LENGTH_SHORT); }
+              public static Toast normal(Context c, CharSequence s, int d) { return t(c, s, d); }
+              public static Toast normal(Context c, int resId, int d) { return t(c, resId, d); }
+          }
+          ''')
+
+          write('src/androidx/fragment/app/DialogFragment.java', '''package androidx.fragment.app;
+          public class DialogFragment extends android.app.DialogFragment {
+              public DialogFragment() { super(); }
+              public void show(FragmentManager manager, String tag) { super.show(manager.fm, tag); }
+          }
+          ''')
+
+          write('src/androidx/appcompat/app/AppCompatDelegate.java', '''package androidx.appcompat.app;
+          public abstract class AppCompatDelegate {
+           public static final int MODE_NIGHT_FOLLOW_SYSTEM=-1;
+           public static final int MODE_NIGHT_NO=1;
+           public static final int MODE_NIGHT_YES=2;
+           private static int mode=MODE_NIGHT_FOLLOW_SYSTEM;
+           public static void setDefaultNightMode(int m){mode=m;}
+           public static int getDefaultNightMode(){return mode;}
+           public void setLocalNightMode(int m){mode=m;}
+           public int getLocalNightMode(){return mode;}
+          }
+          ''')
+
+          write('src/androidx/appcompat/app/AppCompatActivity.java', '''package androidx.appcompat.app;
+          import android.app.Activity;
+          import androidx.appcompat.widget.Toolbar;
+          import androidx.fragment.app.FragmentManager;
+          public class AppCompatActivity extends Activity {
+           private final ActionBar actionBar=new ActionBar();
+           private final AppCompatDelegate delegate=new AppCompatDelegate(){};
+           public void setSupportActionBar(Toolbar t){}
+           public ActionBar getSupportActionBar(){return actionBar;}
+           public FragmentManager getSupportFragmentManager(){return new FragmentManager(getFragmentManager());}
+           public AppCompatDelegate getDelegate(){return delegate;}
+           public boolean onSupportNavigateUp(){finish(); return true;}
+          }
+          ''')
+
+          write('src/androidx/viewpager/widget/ViewPager.java', '''package androidx.viewpager.widget;
+          import android.content.Context; import android.util.AttributeSet;
+          public class ViewPager extends android.widget.FrameLayout {
+           private PagerAdapter a; private int current; private int offscreenPageLimit=1;
+           public ViewPager(Context c){super(c);} public ViewPager(Context c,AttributeSet x){super(c,x);}
+           public void setAdapter(PagerAdapter p){a=p;} public PagerAdapter getAdapter(){return a;}
+           public void setCurrentItem(int p){current=p;} public int getCurrentItem(){return current;}
+           public void setOffscreenPageLimit(int limit){offscreenPageLimit=Math.max(1,limit);}
+           public int getOffscreenPageLimit(){return offscreenPageLimit;}
+          }
+          ''')
+
+          write('src/androidx/drawerlayout/widget/DrawerLayout.java', '''package androidx.drawerlayout.widget;
+          import android.content.Context; import android.util.AttributeSet; import android.view.View;
+          public class DrawerLayout extends android.widget.FrameLayout {
+           public interface DrawerListener {void onDrawerSlide(View v,float o);void onDrawerOpened(View v);void onDrawerClosed(View v);void onDrawerStateChanged(int s);}
+           private DrawerListener listener; private boolean open;
+           public DrawerLayout(Context c){super(c);} public DrawerLayout(Context c,AttributeSet a){super(c,a);} public DrawerLayout(Context c,AttributeSet a,int s){super(c,a,s);}
+           public void addDrawerListener(DrawerListener l){listener=l;}
+           public void setDrawerListener(DrawerListener l){addDrawerListener(l);}
+           public void openDrawer(int g){open=true;if(listener!=null)listener.onDrawerOpened(this);}
+           public void closeDrawer(int g){open=false;if(listener!=null)listener.onDrawerClosed(this);}
+           public void closeDrawers(){closeDrawer(android.view.Gravity.START);}
+           public boolean isDrawerOpen(int g){return open;}
+          }
+          ''')
+
+          write('src/androidx/appcompat/app/ActionBarDrawerToggle.java', '''package androidx.appcompat.app;
+          import android.app.Activity; import android.content.res.Configuration; import android.view.MenuItem; import android.view.Gravity;
+          import androidx.appcompat.widget.Toolbar; import androidx.drawerlayout.widget.DrawerLayout;
+          public class ActionBarDrawerToggle implements DrawerLayout.DrawerListener {
+           private final DrawerLayout drawer;
+           public ActionBarDrawerToggle(Activity a, DrawerLayout d, Toolbar t, int open, int close){drawer=d;}
+           public void syncState(){} public void onConfigurationChanged(Configuration c){}
+           public boolean onOptionsItemSelected(MenuItem item){
+             if(item!=null && item.getItemId()==android.R.id.home){
+               if(drawer.isDrawerOpen(Gravity.START)) drawer.closeDrawer(Gravity.START); else drawer.openDrawer(Gravity.START); return true;
+             }
+             return false;
+           }
+           public void onDrawerSlide(android.view.View v,float o){} public void onDrawerOpened(android.view.View v){}
+           public void onDrawerClosed(android.view.View v){} public void onDrawerStateChanged(int s){}
+          }
+          ''')
+
+          notif = read('src/androidx/core/app/NotificationCompat.java')
+          old = 'public static final int PRIORITY_DEFAULT=0; public static final int PRIORITY_HIGH=1; public static final int PRIORITY_LOW=-1;'
+          new = old + ' public static final int FLAG_ONLY_ALERT_ONCE=Notification.FLAG_ONLY_ALERT_ONCE;'
+          if old not in notif: raise SystemExit('NotificationCompat constants pattern missing')
+          notif = notif.replace(old, new, 1)
+          old = 'public Builder setOnlyAlertOnce(boolean x){return this;} public Builder setPriority(int x){b.setPriority(x);return this;}'
+          new = 'public Builder setOnlyAlertOnce(boolean x){b.setOnlyAlertOnce(x);return this;} public Builder setShowWhen(boolean x){b.setShowWhen(x);return this;} public Builder setPriority(int x){b.setPriority(x);return this;}'
+          if old not in notif: raise SystemExit('NotificationCompat Builder pattern missing')
+          write('src/androidx/core/app/NotificationCompat.java', notif.replace(old,new,1))
+
+          ti = read('src/com/google/android/material/textfield/TextInputLayout.java')
+          old = 'private CharSequence error;'
+          if old not in ti: raise SystemExit('TextInputLayout field pattern missing')
+          ti = ti.replace(old, 'private CharSequence error; private android.view.View.OnClickListener endIconClickListener;', 1)
+          old = 'public void setHint(CharSequence h){} public CharSequence getHint(){return null;}'
+          if old not in ti: raise SystemExit('TextInputLayout hint pattern missing')
+          ti = ti.replace(old, old + '\n public void setEndIconOnClickListener(android.view.View.OnClickListener l){endIconClickListener=l;}', 1)
+          write('src/com/google/android/material/textfield/TextInputLayout.java', ti)
+
+          alert = read('src/androidx/appcompat/app/AlertDialog.java')
+          old = 'public Button getButton(int which){return delegate.getButton(which);}'
+          new = '''public Button getButton(int which){return delegate.getButton(which);}
+              public void setMessage(CharSequence message){delegate.setMessage(message);}
+              public void setMessage(int resId){delegate.setMessage(getContext().getText(resId));}
+              public void setButton(int which, CharSequence text, DialogInterface.OnClickListener listener){delegate.setButton(which,text,listener);}
+              public void setButton(int which, int textId, DialogInterface.OnClickListener listener){delegate.setButton(which,getContext().getText(textId),listener);}'''
+          if old not in alert: raise SystemExit('AlertDialog getButton pattern missing')
+          write('src/androidx/appcompat/app/AlertDialog.java', alert.replace(old,new,1))
+
+          write('src/com/google/android/gms/ads/InterstitialAd.java', '''package com.google.android.gms.ads;
+          import android.content.Context;
+          public class InterstitialAd {
+           private AdListener listener; private boolean loaded; private boolean loading;
+           public InterstitialAd(Context c){} public void setAdUnitId(String s){} public void setAdListener(AdListener l){listener=l;}
+           public void loadAd(AdRequest r){loading=true;loaded=true;loading=false;if(listener!=null)listener.onAdLoaded();}
+           public boolean isLoaded(){return loaded;} public boolean isLoading(){return loading;}
+           public void show(){loaded=false;if(listener!=null)listener.onAdClosed();}
+          }
+          ''')
+
+          print('Deterministic V13 patches applied.')
+          PY
+
+      - name: Fresh AAPT resource compile and regenerate R
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          rm -rf build bin .verify-build
+          mkdir -p build/classes build/stage/lib/arm64-v8a build/stage/lib/armeabi-v7a
+          "$BT/aapt" package -f -m -M AndroidManifest.xml -S res -A assets -I "$ANDROID_JAR" -J gen 2>&1 | tee build/aapt-generate.log
+          echo 'AAPT_GENERATE_EXIT=0' | tee -a build/verification-summary.txt
+
+      - name: Fresh Java compile
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          CP="$ANDROID_JAR"
+          while IFS= read -r jar; do CP="$CP:$jar"; done < <(find libs -maxdepth 1 -type f -name '*.jar' | sort)
+          find src gen -type f -name '*.java' | sort -u > build/java-sources.txt
+          echo "JAVA_SOURCE_COUNT=$(wc -l < build/java-sources.txt)" | tee -a build/verification-summary.txt
+          javac -source 8 -target 8 -encoding UTF-8 -Xlint:none -classpath "$CP" -d build/classes @build/java-sources.txt 2>&1 | tee build/javac.log
+          echo 'JAVA_COMPILE_EXIT=0' | tee -a build/verification-summary.txt
+          echo "CLASS_FILE_COUNT=$(find build/classes -type f -name '*.class' | wc -l)" | tee -a build/verification-summary.txt
+
+      - name: Fresh classic dx dexing
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          (cd build/classes && jar cf ../classes.jar .)
+          mapfile -t JARS < <(find libs -maxdepth 1 -type f -name '*.jar' | sort)
+          "$BT/dx" --dex --output=build/classes.dex build/classes.jar "${JARS[@]}" 2>&1 | tee build/dx.log
+          test -s build/classes.dex
+          file build/classes.dex | tee -a build/verification-summary.txt
+          echo 'DX_EXIT=0' | tee -a build/verification-summary.txt
+
+      - name: Assemble align sign and verify APK
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          "$BT/aapt" package -f -M AndroidManifest.xml -S res -A assets -I "$ANDROID_JAR" -F build/resources.ap_ 2>&1 | tee build/aapt-package.log
+          cp build/resources.ap_ build/app-unsigned.apk
+          cp build/classes.dex build/stage/classes.dex
+          cp -a libs/arm64-v8a/. build/stage/lib/arm64-v8a/
+          cp -a libs/armeabi-v7a/. build/stage/lib/armeabi-v7a/
+          (cd build/stage && zip -q -r ../app-unsigned.apk classes.dex lib)
+          "$BT/zipalign" -f -p 4 build/app-unsigned.apk build/app-aligned.apk
+          "$BT/zipalign" -c -p 4 build/app-aligned.apk
+          keytool -genkeypair -noprompt -keystore build/fresh-debug.keystore -storepass android -alias androiddebugkey -keypass android \
+            -dname 'CN=Android Debug,O=Android,C=US' -keyalg RSA -keysize 2048 -validity 10000
+          "$BT/apksigner" sign --ks build/fresh-debug.keystore --ks-pass pass:android --key-pass pass:android \
+            --out build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk build/app-aligned.apk
+          "$BT/apksigner" verify --verbose --print-certs build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk | tee build/apksigner.log
+          "$BT/zipalign" -c -p 4 build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk
+          "$BT/aapt" dump badging build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk | tee build/badging.txt
+          grep -q "package: name='$PACKAGE'" build/badging.txt
+          grep -q "sdkVersion:'21'" build/badging.txt
+          grep -q "targetSdkVersion:'30'" build/badging.txt
+          grep -q "launchable-activity: name='$LAUNCHER'" build/badging.txt
+          unzip -l build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk | grep -E 'lib/(arm64-v8a|armeabi-v7a)/.*\.so' | tee build/native-libs.txt
+          grep -q 'lib/arm64-v8a/' build/native-libs.txt
+          grep -q 'lib/armeabi-v7a/' build/native-libs.txt
+          sha256sum build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk | tee build/apk-sha256.txt
+          echo 'APK_ASSEMBLY_EXIT=0' | tee -a build/verification-summary.txt
+          echo 'ZIPALIGN_VERIFY=PASS' | tee -a build/verification-summary.txt
+          echo 'APKSIGNER_VERIFY=PASS' | tee -a build/verification-summary.txt
+
+      - name: Install and launch on Android 11 API 30 emulator
+        if: steps.baseline.outputs.ready == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot-save -noaudio -no-boot-anim -gpu swiftshader_indirect
+          script: |
+            set -euo pipefail
+            cd "$PROJECT_DIR"
+            APK='build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk'
+            adb shell getprop ro.build.version.release | tee build/emulator-android-version.txt
+            adb shell getprop ro.product.cpu.abilist | tee build/emulator-abilist.txt
+            adb install -r "$APK" 2>&1 | tee build/adb-install.txt
+            grep -q '^Success$' build/adb-install.txt
+            adb shell pm path "$PACKAGE" | tee build/pm-path.txt
+            grep -q '^package:' build/pm-path.txt
+            adb logcat -c
+            adb shell am start -W -n "$PACKAGE/$LAUNCHER" 2>&1 | tee build/launch.txt
+            grep -Eq 'Status: ok|Complete' build/launch.txt
+            sleep 10
+            adb shell pidof "$PACKAGE" | tee build/pid.txt || true
+            adb logcat -d > build/logcat.txt
+            python3 - <<'PY'
+            from pathlib import Path
+            text = Path('build/logcat.txt').read_text(errors='replace')
+            fatal_blocks = []
+            lines = text.splitlines()
+            for i, line in enumerate(lines):
+                if 'FATAL EXCEPTION' in line:
+                    block = '\n'.join(lines[i:i+40])
+                    if 'com.jepongdevxyz.vpn' in block:
+                        fatal_blocks.append(block)
+            if fatal_blocks:
+                Path('build/package-fatal.txt').write_text('\n\n'.join(fatal_blocks))
+                raise SystemExit('Immediate package FATAL EXCEPTION detected after launch')
+            Path('build/package-fatal.txt').write_text('No immediate FATAL EXCEPTION for com.jepongdevxyz.vpn detected.\n')
+            PY
+            echo 'ADB_INSTALL=PASS' | tee -a build/verification-summary.txt
+            echo 'PACKAGE_PM_PATH=PASS' | tee -a build/verification-summary.txt
+            echo 'LAUNCH_NO_IMMEDIATE_FATAL=PASS' | tee -a build/verification-summary.txt
+
+      - name: Write final verification evidence
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          cat > FRESH-BUILD-VERIFICATION.txt <<EOF
+          JepongDevxyz-VPN V13 fresh verification
+          Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          Commit: $GITHUB_SHA
+          Baseline: JepongDevxyz-VPN-AIDE-Offline-V13-AIDE-981-Fix.zip
+          Android build target: API 30
+          minSdk: 21
+          targetSdk: 30
+
+          $(cat build/verification-summary.txt)
+          APK SHA-256: $(cut -d' ' -f1 build/apk-sha256.txt)
+          Install environment: Android 11 / API 30 Google APIs x86_64 emulator
+          Verification claim scope: fresh compile/package/sign/install/launch only; VPN tunnel functionality requires separate configured runtime test.
+          EOF
+          cat FRESH-BUILD-VERIFICATION.txt
+
+      - name: Package verified source
+        if: steps.baseline.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$GITHUB_WORKSPACE/JepongDevxyz-VPN-AIDE-V13-Verified-Source.zip"
+          (cd "$PROJECT_DIR" && zip -q -r "$GITHUB_WORKSPACE/JepongDevxyz-VPN-AIDE-V13-Verified-Source.zip" . \
+            -x 'build/*' 'bin/*' '.verify-build/*')
+          ls -lh "$GITHUB_WORKSPACE/JepongDevxyz-VPN-AIDE-V13-Verified-Source.zip"
+
+      - name: Upload final verification artifacts
+        if: steps.baseline.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: JepongDevxyz-VPN-V13-verified-build
+          path: |
+            ${{ env.PROJECT_DIR }}/build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk
+            ${{ env.PROJECT_DIR }}/FRESH-BUILD-VERIFICATION.txt
+            ${{ env.PROJECT_DIR }}/build/verification-summary.txt
+            ${{ env.PROJECT_DIR }}/build/aapt-generate.log
+            ${{ env.PROJECT_DIR }}/build/javac.log
+            ${{ env.PROJECT_DIR }}/build/dx.log
+            ${{ env.PROJECT_DIR }}/build/apksigner.log
+            ${{ env.PROJECT_DIR }}/build/badging.txt
+            ${{ env.PROJECT_DIR }}/build/adb-install.txt
+            ${{ env.PROJECT_DIR }}/build/pm-path.txt
+            ${{ env.PROJECT_DIR }}/build/launch.txt
+            ${{ env.PROJECT_DIR }}/build/package-fatal.txt
+            JepongDevxyz-VPN-AIDE-V13-Verified-Source.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
