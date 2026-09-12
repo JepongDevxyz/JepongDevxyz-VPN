@@ -168,6 +168,37 @@ jobs:
           emulator-options: -no-window -no-snapshot-save -noaudio -no-boot-anim -no-metrics -gpu swiftshader_indirect
           script: bash /tmp/v13-scripts/08-emulator.sh
 
+      - name: Print emulator failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          echo '=== package-fatal.txt ==='
+          cat "$PROJECT_DIR/build/package-fatal.txt" || true
+          echo '=== launch.txt ==='
+          cat "$PROJECT_DIR/build/launch.txt" || true
+          echo '=== adb-install.txt ==='
+          cat "$PROJECT_DIR/build/adb-install.txt" || true
+          echo '=== pm-path.txt ==='
+          cat "$PROJECT_DIR/build/pm-path.txt" || true
+          echo '=== package-service.txt ==='
+          cat "$PROJECT_DIR/build/package-service.txt" || true
+
+      - name: Upload emulator failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: JepongDevxyz-VPN-V13-replay-v2-failure-diagnostics
+          path: |
+            ${{ env.PROJECT_DIR }}/build/package-fatal.txt
+            ${{ env.PROJECT_DIR }}/build/logcat.txt
+            ${{ env.PROJECT_DIR }}/build/launch.txt
+            ${{ env.PROJECT_DIR }}/build/adb-install.txt
+            ${{ env.PROJECT_DIR }}/build/pm-path.txt
+            ${{ env.PROJECT_DIR }}/build/package-service.txt
+            ${{ env.PROJECT_DIR }}/build/pid.txt
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Write and require final verification evidence
         shell: bash
         run: |
