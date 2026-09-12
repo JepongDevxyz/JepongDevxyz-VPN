@@ -1,0 +1,292 @@
+name: V13 Replay V3 Runtime Fix Verify and Publish
+
+on:
+  push:
+    branches:
+      - aide-v13-fresh-build-verify
+    paths:
+      - '.github/v13-replay-v3-baseline-url.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v13-replay-v3-verify
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PACKAGE: com.jepongdevxyz.vpn
+      LAUNCHER: com.jepongdevxyz.vpn.activities.SplashActivity
+    steps:
+      - name: Checkout verification branch
+        uses: actions/checkout@v4
+        with:
+          ref: aide-v13-fresh-build-verify
+          fetch-depth: 0
+
+      - name: Read V3 baseline URL
+        id: baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="$(tr -d '\r\n' < .github/v13-replay-v3-baseline-url.txt)"
+          case "$URL" in https://*) ;; *) echo 'Baseline URL must be HTTPS' >&2; exit 1;; esac
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Extract proven scripts from canonical verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+          wf = yaml.safe_load(Path('.github/workflows/v13-end-to-end-verify.yml').read_text(encoding='utf-8'))
+          steps = wf['jobs']['verify']['steps']
+          wanted = {
+              'Install Android 30 build toolchain':'01-toolchain.sh',
+              'Download exact V13 baseline':'02-download.sh',
+              'Apply deterministic verified-source patches':'03-patches.sh',
+              'Fresh AAPT resource compile and regenerate R':'04-aapt.sh',
+              'Fresh Java compile':'05-javac.sh',
+              'Fresh classic dx dexing':'06-dx.sh',
+              'Assemble align sign and verify APK':'07-apk.sh',
+              'Write final verification evidence':'09-evidence.sh',
+              'Package verified source':'10-package.sh',
+          }
+          out = Path('/tmp/v13-scripts'); out.mkdir(parents=True, exist_ok=True)
+          found = set()
+          for step in steps:
+              name = step.get('name')
+              if name in wanted:
+                  script = step.get('run')
+                  if not isinstance(script, str) or not script.strip():
+                      raise SystemExit(f'Missing run script for {name}')
+                  (out / wanted[name]).write_text(script + '\n', encoding='utf-8')
+                  found.add(name)
+              if name == 'Install and launch on Android 11 API 30 emulator':
+                  script = step.get('with', {}).get('script')
+                  if not isinstance(script, str) or 'adb install -r' not in script:
+                      raise SystemExit('Canonical emulator script missing adb install')
+                  old = 'adb install -r "$APK" 2>&1 | tee build/adb-install.txt'
+                  hardened = '''adb wait-for-device
+          PACKAGE_READY=0
+          for attempt in $(seq 1 60); do
+            if adb shell service check package 2>/dev/null | tr -d '\\r' | grep -q 'found'; then
+              if adb shell pm path android >/dev/null 2>&1; then
+                PACKAGE_READY=1
+                break
+              fi
+            fi
+            sleep 2
+          done
+          if [ "$PACKAGE_READY" -ne 1 ]; then
+            echo 'Package Manager did not become healthy' | tee build/package-service.txt
+            exit 1
+          fi
+          adb shell service check package 2>&1 | tee build/package-service.txt
+          adb install -r --no-incremental --no-streaming "$APK" 2>&1 | tee build/adb-install.txt'''
+                  if old not in script:
+                      raise SystemExit('Canonical adb install line changed unexpectedly')
+                  script = script.replace(old, hardened, 1)
+                  (out / '08-emulator.sh').write_text(script + '\n', encoding='utf-8')
+                  found.add(name)
+          expected = set(wanted) | {'Install and launch on Android 11 API 30 emulator'}
+          missing = expected - found
+          if missing:
+              raise SystemExit('Missing canonical steps: ' + ', '.join(sorted(missing)))
+          PY
+          grep -q -- '--no-incremental --no-streaming' /tmp/v13-scripts/08-emulator.sh
+          grep -q 'service check package' /tmp/v13-scripts/08-emulator.sh
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Enable KVM access for emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+            test -r /dev/kvm
+            test -w /dev/kvm
+            echo 'KVM_ACCESS=PASS'
+          else
+            echo 'KVM_ACCESS=UNAVAILABLE; emulator runner may use software acceleration'
+          fi
+
+      - name: Install Android 30 build toolchain
+        shell: bash
+        run: bash /tmp/v13-scripts/01-toolchain.sh
+
+      - name: Download exact V13 baseline
+        shell: bash
+        env:
+          BASELINE_URL: ${{ steps.baseline.outputs.url }}
+        run: bash /tmp/v13-scripts/02-download.sh
+
+      - name: Apply deterministic verified-source patches
+        shell: bash
+        run: bash /tmp/v13-scripts/03-patches.sh
+
+      - name: Apply proven runtime theme fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['PROJECT_DIR'])
+          p = root / 'res/layout/activity_about.xml'
+          text = p.read_text(encoding='utf-8')
+          old = 'android:background="?selectableItemBackground"'
+          new = 'android:background="?android:attr/selectableItemBackground"'
+          count = text.count(old)
+          if count < 1:
+              raise SystemExit('activity_about.xml: known failing selectableItemBackground pattern not found')
+          p.write_text(text.replace(old, new), encoding='utf-8')
+          print(f'RUNTIME_THEME_FIX_COUNT={count}')
+          fixed = p.read_text(encoding='utf-8')
+          if old in fixed or new not in fixed:
+              raise SystemExit('Runtime theme fix verification failed')
+          PY
+          grep -q 'android:background="?android:attr/selectableItemBackground"' "$PROJECT_DIR/res/layout/activity_about.xml"
+
+      - name: Fresh AAPT resource compile and regenerate R
+        shell: bash
+        run: cd "$PROJECT_DIR" && bash /tmp/v13-scripts/04-aapt.sh
+
+      - name: Fresh Java compile
+        shell: bash
+        run: cd "$PROJECT_DIR" && bash /tmp/v13-scripts/05-javac.sh
+
+      - name: Fresh classic dx dexing
+        shell: bash
+        run: cd "$PROJECT_DIR" && bash /tmp/v13-scripts/06-dx.sh
+
+      - name: Assemble align sign and verify APK
+        shell: bash
+        run: cd "$PROJECT_DIR" && bash /tmp/v13-scripts/07-apk.sh
+
+      - name: Install and launch on Android 11 API 30 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: false
+          emulator-options: -no-window -no-snapshot-save -noaudio -no-boot-anim -no-metrics -gpu swiftshader_indirect
+          script: bash /tmp/v13-scripts/08-emulator.sh
+
+      - name: Print emulator failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          echo '=== package-fatal.txt ==='
+          cat "$PROJECT_DIR/build/package-fatal.txt" || true
+          echo '=== fatal context ==='
+          if [[ -f "$PROJECT_DIR/build/logcat.txt" ]]; then
+            grep -A100 -B10 'FATAL EXCEPTION' "$PROJECT_DIR/build/logcat.txt" | head -n 240 || true
+          fi
+          echo '=== activity_about selectable backgrounds ==='
+          grep -n 'selectableItemBackground' "$PROJECT_DIR/res/layout/activity_about.xml" || true
+          echo '=== launch.txt ==='
+          cat "$PROJECT_DIR/build/launch.txt" || true
+          echo '=== adb-install.txt ==='
+          cat "$PROJECT_DIR/build/adb-install.txt" || true
+
+      - name: Upload emulator failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: JepongDevxyz-VPN-V13-replay-v3-failure-diagnostics
+          path: |
+            ${{ env.PROJECT_DIR }}/build/package-fatal.txt
+            ${{ env.PROJECT_DIR }}/build/logcat.txt
+            ${{ env.PROJECT_DIR }}/build/launch.txt
+            ${{ env.PROJECT_DIR }}/build/adb-install.txt
+            ${{ env.PROJECT_DIR }}/build/pm-path.txt
+            ${{ env.PROJECT_DIR }}/build/package-service.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Write and require final verification evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$PROJECT_DIR"
+          bash /tmp/v13-scripts/09-evidence.sh
+          grep -q '^AAPT_GENERATE_EXIT=0$' build/verification-summary.txt
+          grep -q '^JAVA_COMPILE_EXIT=0$' build/verification-summary.txt
+          grep -q '^DX_EXIT=0$' build/verification-summary.txt
+          grep -q '^APK_ASSEMBLY_EXIT=0$' build/verification-summary.txt
+          grep -q '^ADB_INSTALL=PASS$' build/verification-summary.txt
+          grep -q '^PACKAGE_PM_PATH=PASS$' build/verification-summary.txt
+          grep -q '^LAUNCH_NO_IMMEDIATE_FATAL=PASS$' build/verification-summary.txt
+
+      - name: Package verified source
+        shell: bash
+        run: bash /tmp/v13-scripts/10-package.sh
+
+      - name: Upload final verification artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: JepongDevxyz-VPN-V13-replay-v3-verified-build
+          path: |
+            ${{ env.PROJECT_DIR }}/build/JepongDevxyz-VPN-AIDE-FreshBuild-debug.apk
+            ${{ env.PROJECT_DIR }}/FRESH-BUILD-VERIFICATION.txt
+            ${{ env.PROJECT_DIR }}/build/verification-summary.txt
+            ${{ env.PROJECT_DIR }}/build/aapt-generate.log
+            ${{ env.PROJECT_DIR }}/build/javac.log
+            ${{ env.PROJECT_DIR }}/build/dx.log
+            ${{ env.PROJECT_DIR }}/build/apksigner.log
+            ${{ env.PROJECT_DIR }}/build/badging.txt
+            ${{ env.PROJECT_DIR }}/build/package-service.txt
+            ${{ env.PROJECT_DIR }}/build/adb-install.txt
+            ${{ env.PROJECT_DIR }}/build/pm-path.txt
+            ${{ env.PROJECT_DIR }}/build/launch.txt
+            ${{ env.PROJECT_DIR }}/build/package-fatal.txt
+            JepongDevxyz-VPN-AIDE-V13-Verified-Source.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Publish verified source to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$PROJECT_DIR/FRESH-BUILD-VERIFICATION.txt"
+          grep -q '^ADB_INSTALL=PASS$' "$PROJECT_DIR/build/verification-summary.txt"
+          grep -q '^PACKAGE_PM_PATH=PASS$' "$PROJECT_DIR/build/verification-summary.txt"
+          grep -q '^LAUNCH_NO_IMMEDIATE_FATAL=PASS$' "$PROJECT_DIR/build/verification-summary.txt"
+          git fetch origin main
+          git checkout -B main origin/main
+          rsync -a --delete \
+            --exclude='.git/' --exclude='.github/' --exclude='README.md' \
+            --exclude='build/' --exclude='bin/' --exclude='.verify-build/' \
+            "$PROJECT_DIR/" ./
+          git config user.name 'JepongDevxyz'
+          git config user.email 'businessdevgithubjepong@gmail.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Verified source already matches main.'
+          else
+            git commit -m 'fix: publish verified AIDE V13 source'
+            git push origin main
+          fi
+          MAIN_LOCAL="$(git rev-parse HEAD)"
+          MAIN_REMOTE="$(git ls-remote origin refs/heads/main | cut -f1)"
+          test "$MAIN_LOCAL" = "$MAIN_REMOTE"
+          echo "MAIN_PUBLISH_SHA=$MAIN_REMOTE"
