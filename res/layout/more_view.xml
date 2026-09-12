@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="fill_parent"
+     android:layout_width="fill_parent">
+
+    <ImageView
+         android:layout_height="10.0dip"
+         android:layout_width="35.0dip"
+         android:src="@drawable/behavior_icon"
+         app:layout_constraintTop_toTopOf="parent"
+         android:importantForAccessibility="no"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintEnd_toEndOf="parent"
+         android:layout_marginTop="10.0dip"
+         android:id="@+id/behavior_icon" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingBottom="8.0dip"
+         android:layout_marginTop="10.0dip"
+         app:layout_constraintTop_toBottomOf="@id/behavior_icon"
+         android:paddingTop="8.0dip"
+         android:id="@+id/save">
+
+        <ImageView
+             android:layout_height="30.0dip"
+             android:layout_width="30.0dip"
+             android:src="@drawable/ic_save"
+             app:layout_constraintTop_toTopOf="parent"
+             android:importantForAccessibility="no"
+             app:layout_constraintStart_toStartOf="parent"
+             android:layout_marginStart="30.0dip"
+             android:id="@+id/imgDelete" />
+
+        <TextView
+             android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             app:layout_constraintTop_toTopOf="@id/imgDelete"
+             android:ellipsize="end"
+             android:textSize="20.0sp"
+             android:singleLine="true"
+             app:layout_constraintStart_toEndOf="@id/imgDelete"
+             app:layout_constraintBottom_toBottomOf="@id/imgDelete"
+             android:layout_marginStart="15.0dip"
+             android:text="Save configeration" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingBottom="8.0dip"
+         app:layout_constraintTop_toBottomOf="@id/save"
+         android:paddingTop="8.0dip"
+         android:id="@+id/expor">
+
+        <ImageView
+             android:layout_height="30.0dip"
+             android:layout_width="30.0dip"
+             android:src="@drawable/ic_import"
+             app:layout_constraintTop_toTopOf="parent"
+             android:importantForAccessibility="no"
+             app:layout_constraintStart_toStartOf="parent"
+             android:layout_marginStart="30.0dip"
+             android:id="@+id/img" />
+
+        <TextView
+             android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             app:layout_constraintTop_toTopOf="@id/img"
+             android:ellipsize="end"
+             android:textSize="20.0sp"
+             android:singleLine="true"
+             app:layout_constraintStart_toEndOf="@id/img"
+             app:layout_constraintBottom_toBottomOf="@id/img"
+             android:layout_marginStart="15.0dip"
+             android:text="Import Configeration" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,8 @@
+V13 root-cause changes based on the real AIDE error video (981 errors):
+- Classic ADT gen/ source restored and added to .classpath.
+- Pre-generated app R.java added under gen/com/jepongdevxyz/vpn to resolve the cascade of Unknown R errors.
+- Pre-generated BuildConfig.java added under gen/.
+- project.properties lowered to android-30 because the AIDE SDK shown in the video does not expose API 31/33 VERSION_CODES constants.
+- Build.VERSION_CODES.S and TIRAMISU compile-time references replaced with numeric runtime API checks (31 and 33).
+- RootBeer compatibility class now implements every public method used by the app instead of the two-method stub.
+- V12 RecyclerView compatibility fixes retained.

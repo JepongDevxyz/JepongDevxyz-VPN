@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="match_parent"
+     android:layout_width="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:id="@+id/appBar">
+
+        <com.google.android.material.appbar.MaterialToolbar
+             android:layout_height="?android:attr/actionBarSize"
+             android:layout_width="match_parent"
+             app:title="@string/edit_config_title"
+             android:id="@+id/toolbar" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+         android:layout_height="match_parent"
+         android:layout_width="match_parent"
+         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:padding="16dp"
+             android:orientation="vertical">
+
+            <LinearLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"
+                 android:background="@drawable/neumorphic_background"
+                 android:layout_margin="5dp"
+                 android:padding="15dp"
+                 android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Remarks"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_remarks">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_remarks" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Address"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_address">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_address" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Port"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_port">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:inputType="number"
+                         android:id="@+id/edit_port" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="ID"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_id">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_id" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Alter ID"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_alter_id">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:inputType="number"
+                         android:id="@+id/edit_alter_id" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_security"
+                     android:text="Security" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_security">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_security">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:id="@+id/tv_network"
+                     android:text="Network" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_network">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_network">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_header_type"
+                     android:text="Header Type" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_header_type">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_header_type">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_xhttp_mode"
+                     android:text="XHTTP Mode" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_xhttp_mode">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_xhttp_mode">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_grpc_mode"
+                     android:text="gRPC Mode" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_grpc_mode">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_grpc_mode">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Host"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_host">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_host" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Path"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_path">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_path" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="@string/kcp_seed"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_kcp_seed">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_kcp_seed" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="@string/xhttp_extra"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_xhttp_extra">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:minLines="3"
+                         android:inputType="textMultiLine"
+                         android:id="@+id/edit_xhttp_extra" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="@string/grpc_authority"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_grpc_authority">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_grpc_authority" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="@string/grpc_service_name"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_grpc_service_name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_grpc_service_name" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:id="@+id/tv_tls"
+                     android:text="TLS" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_tls">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_tls">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="SNI"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_sni">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_sni" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_fp"
+                     android:text="Fingerprint" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_fp">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_fp">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_alpn"
+                     android:text="ALPN" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_alpn">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_alpn">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:textSize="14sp"
+                     android:textColor="@color/text_input_border_unfocused"
+                     android:layout_marginTop="5dp"
+                     android:id="@+id/tv_allow_insecure"
+                     android:text="Allow Insecure" />
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:background="@drawable/spinner_border"
+                     android:orientation="vertical"
+                     android:id="@+id/til_allow_insecure">
+
+                    <Spinner
+                         android:layout_height="56dp"
+                         android:layout_width="match_parent"
+                         android:id="@+id/spinner_allow_insecure">
+
+                    </Spinner>
+
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Public Key"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_public_key">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_public_key" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Short ID"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_short_id">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_short_id" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="Spider X"
+                     style="@style/CustomTextInputLayout"
+                     android:layout_marginTop="8dp"
+                     android:id="@+id/til_spider_x">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="match_parent"
+                         android:id="@+id/edit_spider_x" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

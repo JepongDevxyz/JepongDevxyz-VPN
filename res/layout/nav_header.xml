@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_height="150dip"
+     android:layout_width="fill_parent"
+     android:gravity="bottom"
+     android:padding="12.0dip"
+     android:orientation="vertical">
+
+    <LinearLayout
+         android:layout_height="fill_parent"
+         android:layout_width="fill_parent"
+         android:gravity="center|start"
+         android:orientation="horizontal">
+
+        <ImageView
+             android:layout_height="60.0dip"
+             android:layout_width="60.0dip"
+             android:scaleType="centerCrop"
+             android:src="@drawable/v2"
+             android:layout_marginLeft="15dp"
+             android:id="@+id/nav_header_circleimageview_id" />
+
+        <LinearLayout
+             android:layout_height="fill_parent"
+             android:layout_width="fill_parent"
+             android:gravity="center|start"
+             android:orientation="vertical">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Body2"
+                 android:textSize="17.0sp"
+                 android:id="@+id/nav_header_app_name"
+                 android:paddingTop="8.0dip"
+                 android:text="@string/app_name"
+                 android:textStyle="bold" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Body2"
+                 android:textSize="14.0sp"
+                 android:id="@+id/nav_headerAppVersion"
+                 android:paddingTop="8.0dip" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

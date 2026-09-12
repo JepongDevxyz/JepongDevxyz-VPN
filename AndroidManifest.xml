@@ -1,0 +1,191 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.jepongdevxyz.vpn"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30" />
+
+    <!-- Full network access -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <application
+        android:name="com.jepongdevxyz.vpn.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/v2"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:resizeableActivity="true"
+        android:usesCleartextTraffic="true"
+        android:extractNativeLibs="true"
+        android:hardwareAccelerated="true"
+        android:requestLegacyExternalStorage="true">
+
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.jepongdevxyz.vpn.MainActivity" />
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.ConfigGeralActivity"
+            android:label="@string/settings"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity" />
+
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.ConfigImportFileActivity"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:label="@string/settings_import"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:port="*" />
+                <data android:pathPattern=".*.v2i" />
+                <data android:pathPattern=".*..*.v2i" />
+                <data android:pathPattern=".*..*..*.v2i" />
+                <data android:pathPattern=".*..*..*..*.v2i" />
+                <data android:pathPattern=".*..*..*..*..*.v2i" />
+                <data android:pathPattern=".*..*..*..*..*..*.v2i" />
+                <data android:pathPattern=".*..*..*..*..*..*..*.v2i" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.EditV2rayConfigActivity"
+            android:parentActivityName="com.jepongdevxyz.vpn.activities.v2ray" />
+
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.v2ray"
+            android:label="V2ray JSON"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity" />
+
+        <activity
+            android:name="com.jepongdevxyz.vpn.LaunchVpn"
+            android:label="@string/app_name" />
+
+        <!-- - Receivers -->
+        <receiver
+            android:name="com.jepongdevxyz.vpn.core.MainReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.jepongdevxyz.vpn.core.MainReceiver.ACTION_SERVICE_STOP">
+                </action>
+                <action android:name="com.jepongdevxyz.vpn.core.MainReceiver.ACTION_SERVICE_RESTART">
+                </action>
+            </intent-filter>
+        </receiver>
+
+        <!-- - Services -->
+        
+        <service
+            android:label="@string/app_name"
+            android:name="com.jepongdevxyz.vpn.tunnel.vpn.TunnelVpnService"
+            android:exported="false"
+            android:enabled="true"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+        
+        <service
+            android:name="com.jepongdevxyz.vpn.V2Service"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:process=":RunSoLibV2RayDaemon">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true" />
+        </service>
+
+        <service
+            android:name="com.jepongdevxyz.vpn.tunnel.V2Proxy"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:process=":RunSoLibV2RayDaemon" />
+        
+        <service android:name="me.dawson.proxyserver.ui.ProxyService" />
+        <service
+            android:name="com.jepongdevxyz.vpn.service.SocksDNSService"
+            android:exported="false">
+        </service>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+        <meta-data
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2465853854600127~3790130000" />
+        <meta-data
+                android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true" />
+
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.ConfigExportFileActivity"
+            android:label="@string/settings_export"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity" />
+     
+        <activity
+            android:name="me.dawson.proxyserver.ui.ProxySettings"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity"
+            android:label="Compartir Internet" />
+<activity
+            android:name="com.jepongdevxyz.vpn.activities.ExceptionActivity"
+            android:label="@string/app_crash" />
+        <activity
+            android:name="com.jepongdevxyz.vpn.TunnelActivity"
+            android:label="@string/tunnel_type"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity" />
+        <activity
+            android:name="com.jepongdevxyz.vpn.activities.AboutActivity"
+            android:label="@string/about"
+            android:parentActivityName="com.jepongdevxyz.vpn.MainActivity" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/v2" />
+<activity
+            android:name="com.jepongdevxyz.vpn.activities.LicenseActivity"
+            android:label="@string/license"
+            android:parentActivityName="com.jepongdevxyz.vpn.activities.AboutActivity" />
+    </application>
+
+</manifest>

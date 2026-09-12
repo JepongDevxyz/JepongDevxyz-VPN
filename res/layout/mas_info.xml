@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="fill_parent"
+     android:layout_width="fill_parent">
+
+    <RelativeLayout
+         android:layout_height="match_parent"
+         android:layout_width="fill_parent"
+         android:padding="16.0dip"
+         android:layout_gravity="fill_vertical">
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:layout_margin="5.0dip"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/card_view_about"
+             android:paddingTop="10.0dip"
+             android:foreground="?android:selectableItemBackground">
+
+            <RelativeLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="fill_parent"
+                 android:padding="10.0dip">
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:padding="10.0dip"
+                     android:orientation="vertical">
+
+                    <TextView
+                         android:layout_height="wrap_content"
+                         android:layout_width="wrap_content"
+                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                         android:padding="5.0dip"
+                         android:layout_alignParentStart="true"
+                         android:id="@+id/about_desc_1"
+                         android:text="@string/info1" />
+
+                    <TextView
+                         android:layout_height="wrap_content"
+                         android:layout_width="wrap_content"
+                         android:layout_marginBottom="16.0dip"
+                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                         android:padding="5.0dip"
+                         android:layout_marginTop="16.0dip"
+                         android:layout_alignParentStart="true"
+                         android:id="@+id/about_desc_2"
+                         android:text="@string/info2" />
+
+                    <TextView
+                         android:layout_height="wrap_content"
+                         android:layout_width="wrap_content"
+                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                         android:padding="5.0dip"
+                         android:layout_alignParentStart="true"
+                         android:id="@+id/about_desc_2t"
+                         android:text="@string/info3" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:layout_below="@id/card_view_about"
+             android:layout_margin="5.0dip"
+             android:onClick="licencia"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/help_about"
+             android:paddingTop="10.0dip"
+             android:foreground="?android:selectableItemBackground">
+
+            <LinearLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="fill_parent"
+                 android:padding="10.0dip"
+                 android:orientation="horizontal">
+
+                <ImageView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     app:tint="@color/secondary_text"
+                     app:srcCompat="@drawable/ic_licenses"
+                     android:layout_gravity="center" />
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:textSize="20.0sp"
+                     android:layout_marginStart="5.0dip"
+                     android:layout_gravity="center"
+                     android:id="@+id/help_title_2"
+                     android:text="@string/about1" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+</ScrollView>

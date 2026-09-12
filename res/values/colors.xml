@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/md_theme_light_primary</color>
+    <color name="colorPrimaryDark">@color/colorAccent</color>
+    <color name="colorAccent">@color/md_theme_light_primary</color>
+    <color name="contentBackground">#FDFCFF</color>
+    <color name="button_pressed">@color/colorAccent</color>
+    <color name="button_normal">@color/colorAccent</color>
+
+    <color name="text_primary">@android:color/black</color>
+
+    <color name="textColorPrimary">#000000</color>
+    <color name="textColorSecondary">#000000</color>
+    <color name="colorTextEnabled">#333333</color>
+    <color name="colorTextDisabled">#DEDEDE</color>
+    <color name="tab_indicator_gray">#c0c0c0</color>
+    <color name="intro_title_color">#000000</color>
+    <color name="intro_description_color">#656565</color>
+    <color name="gradient_start_color">#071A6E</color>
+    <color name="gradient_end_color">#1D2B68</color>
+    <color name="rippelColor">#ffa420</color>
+    <color name="colorBtn">#1e252b</color>
+    <!-- color toolbar / targetas -->
+    <color name="darkbrown">#AF4A00</color>
+    <color name="cp_0">#AF4A00</color>
+    <color name="cp_1">#787878</color>
+    <color name="cp_4">#AF4A00</color>
+    <color name="container">#D1E4FF</color>
+    <color name="fabColor">#0061A4</color>
+    <color name="fabColor1">#0061A4</color>
+    <color name="secondary_text">#ff8b8b8b</color>
+    <color name="text_black">#ff363636</color>
+    <color name="card_view_bg">#F1F0F4</color>
+    <color name="lightGrey">#ff97979a</color>
+    <color name="button_text_color_m3">#fffcfcfc</color>
+
+    <color name="colorText">#ffffff</color>
+    <color name="colorPrimaryBackground">#EAEAEA</color>
+    <color name="colorSecondaryBackground">#ffffff</color>
+    <color name="gray_light">#DEDEDE</color>
+    <color name="blue">#0062AF</color>
+    <color name="blue_light">#0A87FB</color>
+    <color name="gray">#808080</color>
+    <color name="black_light">#333333</color>
+    <color name="white">#ffffff</color>
+    <color name="red">#FD1C0D</color>
+    <color name="yellow">#EEFD00</color>
+    <color name="green">#04D000</color>
+    <color name="dot_dark_screen1">#000000</color>
+    <color name="seed">#0061a4</color>
+    <color name="md_theme_light_primary">#0061A4</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#D1E4FF</color>
+    <color name="md_theme_light_onPrimaryContainer">#001D36</color>
+    <color name="md_theme_light_secondary">#0061A4</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#D7E3F8</color>
+    <color name="md_theme_light_onSecondaryContainer">#101C2B</color>
+    <color name="md_theme_light_tertiary">#0061A2</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+    <color name="md_theme_light_tertiaryContainer">#D1E4FF</color>
+    <color name="md_theme_light_onTertiaryContainer">#001D36</color>
+    <color name="md_theme_light_error">#BA1A1A</color>
+    <color name="md_theme_light_errorContainer">#FFDAD6</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+    <color name="md_theme_light_onErrorContainer">#410002</color>
+    <color name="md_theme_light_background">#FDFCFF</color>
+    <color name="md_theme_light_onBackground">#1A1C1E</color>
+    <color name="md_theme_light_surface">#FDFCFF</color>
+    <color name="md_theme_light_onSurface">#1A1C1E</color>
+    <color name="md_theme_light_surfaceVariant">#DFE2EB</color>
+    <color name="md_theme_light_onSurfaceVariant">#43474E</color>
+    <color name="md_theme_light_outline">#73777F</color>
+    <color name="md_theme_light_inverseOnSurface">#F1F0F4</color>
+    <color name="md_theme_light_inverseSurface">#2F3033</color>
+    <color name="md_theme_light_inversePrimary">#9FCAFF</color>
+    <color name="md_theme_light_shadow">#000000</color>
+    <color name="md_theme_light_surfaceTint">#0061A4</color>
+    <color name="md_theme_light_outlineVariant">#C3C6CF</color>
+    <color name="md_theme_light_scrim">#000000</color>
+    
+    <!-- Colores para el selector del borde -->
+    <color name="text_input_border_focused">#4D9DE0</color> <!-- Verde oscuro cuando está enfocado -->
+    <color name="text_input_border_unfocused">#FF757575</color> <!-- Gris oscuro cuando no está enfocado -->
+    <color name="starlight">#F5F5F1</color> <!-- Starlight -->
+    <color name="redph">#FF3B30</color> <!-- Red -->
+    <color name="silver">#FF9E9E9E</color> <!-- Silver -->
+    <color name="greenph">#4CD964</color> <!-- Green -->
+    <color name="yellowph">#FFCC00</color> <!-- Yellow -->
+    
+    <color name="card_background">#FFFFFF</color>  <!-- Fondo blanco -->
+    <color name="card_stroke_color">#E0E0E0</color>  <!-- Borde gris claro -->
+
+</resources>

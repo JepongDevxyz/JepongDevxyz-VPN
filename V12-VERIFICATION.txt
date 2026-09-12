@@ -1,0 +1,25 @@
+JepongDevxyz VPN - AIDE Offline V12 Verification
+
+Root cause addressed:
+- V11 RecyclerView compatibility source lacked Adapter.onAttachedToRecyclerView(...)
+- V11 RecyclerView compatibility source lacked Adapter.onDetachedFromRecyclerView(...)
+- V11 LinearLayoutManager compatibility source lacked getItemCount()
+- LogsAdapter uses onAttachedToRecyclerView() and LinearLayoutManager.getItemCount(), so V11 could fail at real Java compilation even when a shallow static gate passed.
+
+Regression checks performed:
+- V11 compatibility regression test: FAIL on all 3 missing APIs (expected RED)
+- V12 compatibility regression test: PASS on all 3 APIs (GREEN)
+- Java 8 smoke compile of patched RecyclerView + LinearLayoutManager: PASS
+- Runtime smoke check for adapter item-count plumbing: PASS (itemCount=7)
+- Active app R.* references checked after stripping comments: 472
+- Missing active app resources: 0
+- Resource XML files checked for well-formed XML: 159
+- Manifest XML: well-formed
+- Local JAR count: 9
+- Maximum local JAR class-file major version: 52 (Java 8)
+- Duplicate top-level source/JAR classes: 0
+- Legacy com.zeninjector.vpn text references: 0
+
+Important limitation:
+- This environment does not contain the appfour AIDE Android build toolchain, so an actual on-device AIDE APK build cannot be honestly claimed here.
+- Final proof is the Build APK result inside AIDE on your device.

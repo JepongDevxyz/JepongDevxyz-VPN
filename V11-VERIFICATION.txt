@@ -1,0 +1,21 @@
+JepongDevxyz VPN - Offline V11 Verification
+
+App name: JepongDevxyz VPN
+Package: com.jepongdevxyz.vpn
+Format: Classic Eclipse/AIDE project
+Gradle files: 0
+Remote Maven coordinates: 0
+Deep static verification errors: 0
+Java source files checked: 217
+XML files checked: 159
+Local JARs checked: 9
+Known local classes indexed: 1473
+Required ARMv7/ARM64 V2Ray native libraries: present
+Required geoip/geosite assets: present
+pdnsd local resource: present
+Legacy package references: 0
+
+PASS: deep offline AIDE static gate
+PASS: classic AIDE offline dependency gate
+
+Final proof still requires an actual successful build inside appfour AIDE on-device.

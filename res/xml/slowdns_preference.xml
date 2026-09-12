@@ -1,0 +1,55 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+	
+
+		<com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:key="chaveKey"
+            android:title="@string/public_key"
+        app:iconSpaceReserved="false"
+            android:summary="@string/summary_private_key"
+            android:dialogMessage=""
+			android:singleLine="false"
+			 />
+
+		<com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:key="serverNameKey"
+            app:iconSpaceReserved="false"
+            android:title="@string/title_name_server"
+            android:summary="@string/summary_name_server"
+            android:dialogMessage=""
+			android:singleLine="true"
+			 />
+		
+		<com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:key="dnsKey"
+            android:title="DNS"
+            app:iconSpaceReserved="false"
+			android:summary="@string/summary_dns"
+			android:singleLine="true"
+			android:defaultValue="8.8.8.8"
+			/>
+
+	
+
+		<com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:key="sshUser"
+            app:iconSpaceReserved="false"
+            android:title="@string/auth_username"
+            android:summary="@string/no_value"
+            android:dialogMessage=""
+			android:singleLine="true"
+			 />
+
+		<com.jepongdevxyz.vpn.view.PasswordEditTextPreference
+            android:key="sshPass"
+            app:iconSpaceReserved="false"
+            android:title="@string/proxy_pass"
+            android:summary="@string/no_value"
+            android:dialogMessage=""
+			android:singleLine="true"
+            />
+
+
+
+</PreferenceScreen>

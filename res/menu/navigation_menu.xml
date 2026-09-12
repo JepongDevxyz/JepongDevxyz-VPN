@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <group android:id="@+id/grupo1">
+        <item
+            android:id="@+id/payload_generator"
+            android:icon="@drawable/ic_developer_mode_white_24dp"
+            android:title="@string/pay_gen" />
+
+
+        <item
+            android:id="@+id/miPhoneConfg"
+            android:icon="@drawable/ic_radio_tower"
+            android:title="@string/network_mobile" />
+
+
+    </group>
+
+
+    <group android:id="@+id/grupo14">
+
+        <item
+                android:id="@+id/miSettings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings" />
+
+    </group>
+
+
+    <group android:id="@+id/grupo215">
+
+
+        <item
+                android:icon="@drawable/hp"
+            android:id="@+id/wifi_hp"
+            android:visible="false"
+            android:title="Shared WIFI" />
+
+
+        <item
+                android:icon="@drawable/ic_rate_review"
+            android:id="@+id/ex2"
+            android:visible="false"
+            android:title="Rate App" />
+
+    </group>
+
+
+    <item
+            android:icon="@drawable/battery_profile"
+        android:id="@+id/BATTERY_OPTIMIZATION"
+        android:title="Optimazation" />
+
+
+    <item
+            android:id="@+id/idha"
+        android:icon="@drawable/ic_fingerprint"
+        android:title="Hardware ID" />
+
+
+    <item
+            android:id="@+id/tele_group"
+        android:icon="@drawable/ic_telegram"
+        android:title="Community" />
+
+
+    <item
+            android:id="@+id/miExit"
+        android:icon="@drawable/ic_exit"
+        android:title="@string/exit" />
+
+
+</menu>

@@ -1,0 +1,11 @@
+JepongDevxyz VPN - AIDE Offline V12 candidate
+
+Changes from V11:
+- Fixed RecyclerView.Adapter API surface required by LogsAdapter.
+- Added onAttachedToRecyclerView / onDetachedFromRecyclerView lifecycle hooks.
+- Fixed LinearLayoutManager.getItemCount() used by LogsAdapter.scrollToLastPosition().
+- Added minimal adapter/layout-manager attachment plumbing so item count follows the active adapter.
+- Kept app R and BuildConfig generation under AIDE/ADT; no hand-written app R.java or BuildConfig.java was added, avoiding duplicate generated classes.
+
+Important:
+This package is statically verified in the container. Final proof of AIDE compatibility still requires an on-device AIDE build because the AIDE compiler/runtime is not available in this environment.

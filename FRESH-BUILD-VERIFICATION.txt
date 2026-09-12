@@ -1,0 +1,23 @@
+JepongDevxyz-VPN V13 fresh verification
+Workflow run: https://github.com/JepongDevxyz/JepongDevxyz-VPN/actions/runs/34683488087
+Commit: 01abf60884109fc0daa9db1fa7dee884d55af967
+Baseline: JepongDevxyz-VPN-AIDE-Offline-V13-AIDE-981-Fix.zip
+Android build target: API 30
+minSdk: 21
+targetSdk: 30
+
+AAPT_GENERATE_EXIT=0
+JAVA_SOURCE_COUNT=219
+JAVA_COMPILE_EXIT=0
+CLASS_FILE_COUNT=416
+build/classes.dex: Dalvik dex file version 035
+DX_EXIT=0
+APK_ASSEMBLY_EXIT=0
+ZIPALIGN_VERIFY=PASS
+APKSIGNER_VERIFY=PASS
+ADB_INSTALL=PASS
+PACKAGE_PM_PATH=PASS
+LAUNCH_NO_IMMEDIATE_FATAL=PASS
+APK SHA-256: f17015a02ab52f7292c90202ba5a08dd2c41c81327cc7869aea4b6ff4f5d9c6b
+Install environment: Android 11 / API 30 Google APIs x86_64 emulator
+Verification claim scope: fresh compile/package/sign/install/launch only; VPN tunnel functionality requires separate configured runtime test.

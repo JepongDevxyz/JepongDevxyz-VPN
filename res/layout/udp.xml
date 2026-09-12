@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="wrap_content"
+     android:layout_width="match_parent"
+     android:orientation="vertical">
+
+    <com.google.android.material.textfield.TextInputLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingRight="20.0dip"
+         android:paddingLeft="20.0dip"
+         android:layout_marginLeft="10.0dip"
+         android:layout_marginRight="10.0dip"
+         android:paddingTop="20.0dip">
+
+        <com.google.android.material.textfield.TextInputEditText
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:hint="Server Ip/host"
+             android:singleLine="true"
+             android:inputType="text"
+             android:ems="9"
+             android:id="@+id/server" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingRight="20.0dip"
+         android:paddingLeft="20.0dip"
+         android:layout_marginLeft="10.0dip"
+         android:layout_marginRight="10.0dip"
+         android:paddingTop="20.0dip">
+
+        <com.google.android.material.textfield.TextInputEditText
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:hint="Udp Obfs"
+             android:id="@+id/obfs" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    
+    
+    <com.google.android.material.textfield.TextInputLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingRight="20.0dip"
+         android:paddingLeft="20.0dip"
+         android:layout_marginLeft="10.0dip"
+         android:layout_marginRight="10.0dip"
+         android:paddingTop="20.0dip">
+
+        <com.google.android.material.textfield.TextInputEditText
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:hint="Udp Auth"
+             android:id="@+id/auth" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    
+
+              <com.google.android.material.textfield.TextInputLayout
+                         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingRight="20.0dip"
+         android:paddingLeft="20.0dip"
+         android:layout_marginLeft="10.0dip"
+         android:layout_marginRight="10.0dip"
+         android:paddingTop="20.0dip"
+                         
+                         >
+
+                        <com.google.android.material.textfield.TextInputEditText
+                             android:layout_height="wrap_content"
+                             android:layout_width="match_parent"
+                             android:hint="UDP DOWN"
+                             android:id="@+id/udpdown" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingRight="20.0dip"
+         android:paddingLeft="20.0dip"
+         android:layout_marginLeft="10.0dip"
+         android:layout_marginRight="10.0dip"
+         android:paddingTop="20.0dip"
+                         
+                         >
+
+                        <com.google.android.material.textfield.TextInputEditText
+                             android:layout_height="wrap_content"
+                             android:layout_width="match_parent"
+                             android:hint="UDP UP"
+                             android:id="@+id/udpup" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+    
+    
+     <com.google.android.material.textfield.TextInputLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:paddingRight="20.0dip"
+         android:paddingLeft="20.0dip"
+        android:visibility="gone"
+         android:layout_marginLeft="10.0dip"
+         android:layout_marginRight="10.0dip"
+         android:paddingTop="20.0dip">
+
+        <com.google.android.material.textfield.TextInputEditText
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:hint="Udp Buffer"
+            android:text="8888"
+             android:id="@+id/buffer" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    
+
+       
+    
+    
+    
+    
+</LinearLayout>

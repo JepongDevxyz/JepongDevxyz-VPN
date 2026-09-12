@@ -1,0 +1,156 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:key="screenMain">
+	
+    <ListPreference
+            android:icon="@drawable/ic_ui_mode"
+            android:entries="@array/pref_modoNoturno_option_labels"
+            android:title="Theme"
+            android:key="modeNight"
+            android:summary="UI Theme"
+            android:defaultValue="off"
+            android:entryValues="@array/pref_modoNoturno_option_values" />
+    
+    
+    	
+    
+    	<SwitchPreferenceCompat
+			android:key="data_compression"
+			android:title="Data Compression"
+           android:defaultValue="true"
+        app:iconSpaceReserved="false"
+			android:summary="Compresses and accelerates data transfer for compressible files/data. NOT recommended for devices with low memory."
+			/>
+    
+    
+       <SwitchPreferenceCompat
+            android:key="wakelock"
+            android:defaultValue="true"
+        app:iconSpaceReserved="false"
+            android:summary="Enable only if the app stops working on its own, such as when locking the screen on some devices."
+            android:title="CPU Activation"
+			android:singleLine="true"/>
+    
+    
+        <SwitchPreferenceCompat
+            android:key="vibrate"
+            android:title="Vibrar"
+        app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:summary="Vibrate when connection status changes"
+        />
+    
+        <SwitchPreferenceCompat
+        android:title="@string/title_forward_dns"
+        android:key="dnsForward"
+        android:summary="@string/summary_forward_dns"
+        app:iconSpaceReserved="false" />
+    <com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+        android:singleLine="true"
+        android:title="@string/title_dns_primary"
+        android:key="dnsResolver1"
+        android:defaultValue="8.8.8.8"
+        android:summary="@string/summary_dns_primary"
+        app:iconSpaceReserved="false" />
+    <com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+        android:singleLine="true"
+        android:title="@string/title_dns_secondary"
+        android:key="dnsResolver2"
+        android:defaultValue="8.8.4.4"
+        android:summary="@string/summary_dns_secondary"
+        app:iconSpaceReserved="false" />
+    
+
+		<SwitchPreferenceCompat
+			android:key="udpForward"
+            android:title="@string/title_forward_udp"
+			android:summary="@string/summary_forward_udp"
+			android:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
+		
+		<com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:key="udpResolver"
+            android:title="@string/title_resolver_udp"
+			android:defaultValue="127.0.0.1:7300"
+            android:summary="@string/summary_resolver_udp"
+            android:dialogMessage=""
+           
+			android:singleLine="true"
+            app:iconSpaceReserved="false" />
+
+
+
+
+
+    
+    
+		<SwitchPreferenceCompat
+			android:key="auto_ping"
+        android:title="Auto ping"
+        
+			android:summary="Set a server for ping"
+            app:iconSpaceReserved="false"
+			/>
+	
+		 <com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:dependency="auto_ping"
+            android:key="ping_server"
+            app:iconSpaceReserved="false"
+            android:title="Ping Server"
+			android:summary="Set ping server"
+			android:defaultValue="clients3.google.com"
+		    
+/>
+
+    
+    
+    
+	<ListPreference
+        	android:key="numberMaxThreadSocks"
+            app:iconSpaceReserved="false"
+            android:title="@string/title_number_max_threads"
+			android:summary="@string/summary_number_max_threads"
+			android:defaultValue="8th"
+        	android:entries="@array/pref_maxThreads_option_labels"
+        	android:entryValues="@array/pref_maxThreads_option_values"
+		/>
+		
+		<SwitchPreferenceCompat
+			android:key="tetherSubnet"
+            app:iconSpaceReserved="false"
+			android:summary="@string/summary_tethering_subnet"
+			android:title="@string/title_tethering_subnet"
+		/>
+		
+		<SwitchPreferenceCompat
+			android:key="disableDelaySSH"
+            app:iconSpaceReserved="false"
+			android:title="@string/title_disable_delay_ssh"
+			android:summary="@string/summary_disable_delay_ssh"
+		/>
+	
+	
+		 
+		
+		<com.jepongdevxyz.vpn.view.SummaryEditTextPreference
+            android:key="pingerSSH"
+           
+            android:title="@string/title_ping_time"
+			android:maxLength="3"
+			android:defaultValue="3"
+            android:summary="@string/title_ping_time"
+			android:singleLine="true"
+	        app:iconSpaceReserved="false"	/>
+
+
+	
+        
+        
+    
+   
+    
+    
+	
+</PreferenceScreen>

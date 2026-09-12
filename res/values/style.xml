@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MaterialButton">
+        <attr
+                name="colorPressed"
+                format="color" />
+        <attr
+                name="colorNormal"
+                format="color" />
+        <attr
+                name="cornerRadius"
+                format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="ExpandCollapseCard">
+        <attr
+                name="title"
+                format="string" />
+        <attr
+                name="title_size"
+                format="dimension" />
+        <attr
+                name="title_color"
+                format="color" />
+        <attr
+                name="title_background_color"
+                format="color" />
+        <attr
+                name="item_inner_view"
+                format="reference" />
+        <attr
+                name="expand_icon"
+                format="reference" />
+        <attr
+                name="collapse_icon"
+                format="reference" />
+    </declare-styleable>
+    <style name="mySwitch">
+        <item name="android:colorControlActivated">@color/colorAccent</item>
+    </style>
+
+
+    <style
+            name="Theme.Material3.Preference"
+            parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="preferenceTheme">@style/MaterialPreferenceThemeOverlay</item>
+    </style>
+
+    <style
+            name="MaterialPreferenceThemeOverlay"
+            parent="PreferenceThemeOverlay">
+        <item name="switchPreferenceCompatStyle">@style/Preference.SwitchPreferenceCompat</item>
+    </style>
+
+    <style
+            name="Preference.SwitchPreferenceCompat"
+            parent="Preference.SwitchPreferenceCompat.Material">
+        <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
+    </style>
+
+
+    <style
+            name="ThemeOverlay.App.MaterialAlertDialog"
+            parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorOnSurface">@color/colorPrimary</item>
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
+        <item name="dialogCornerRadius">15dp</item>
+    </style>
+
+    <!-- Note: shape appearance doesn't work with the preference dialogs (they're not material) -->
+    <style
+            name="MaterialAlertDialog.App"
+            parent="MaterialAlertDialog.Material3">
+        <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+
+
+    <style
+            name="ThemeOverlay.App.MaterialAlertDialog.Monet"
+            parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
+        <item name="dialogCornerRadius">@dimen/yourcorners</item>
+
+    </style>
+
+
+    <style name="UnitTextStyle">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">@dimen/_12ssp</item>
+        <item name="android:fontFamily">@font/fugaz_one_font</item>
+
+    </style>
+
+
+    <style
+            name="AppTheme"
+            parent="Theme.Material3.Light.NoActionBar">
+
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+        <item
+                name="android:navigationBarColor"
+>@color/md_theme_light_primary</item>
+        <item name="colorPrimaryDark">@color/md_theme_light_primary</item>
+
+
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog.Monet</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog.Monet</item>
+
+        <item name="dialogCornerRadius">28dp</item>
+
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
+        
+
+    </style>
+
+    
+    <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/ModalBottomSheetDialog</item>
+</style>
+    
+    <style name="ModalBottomSheetDialog" parent="Widget.Material3.BottomSheet.Modal">
+
+    <item name="shapeAppearance">@style/ShapeAppearance.App.LargeComponent</item>
+</style>
+
+<style name="ShapeAppearance.App.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+    <item name="cornerFamily">cut</item>
+    <item name="cornerSize">24dp</item>
+</style>
+
+    <style
+            name="dialog"
+            parent="Theme.AppCompat.Dialog.Alert">
+        <item name="@android:windowEnterAnimation">@anim/modal_in</item>
+        <item name="@android:windowExitAnimation">@anim/modal_out</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
+    </style>
+
+    <style
+            name="Widget.App.CircularProgressIndicator"
+            parent="Widget.Material3.CircularProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.CircularProgressIndicator</item>
+        <item name="trackThickness">20dp</item>
+    </style>
+
+    <style
+            name="HiroPopUpMenu"
+            parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/card_view_bg</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
+    <style
+            name="ThemeOverlay.App.CircularProgressIndicator"
+            parent="Widget.Material3.CircularProgressIndicator">
+        <item name="colorAccent">@color/fabColor1</item>
+
+    </style>
+
+
+    <style
+            name="CustomOutlinedBox"
+            parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/colorAccent</item>
+        <item name="android:textColorHint">#ffffff</item>
+        <item name="hintTextColor">#ffffff</item>
+    </style>
+
+    <style
+            name="AppAlertDialog"
+        parent="@style/ThemeOverlay.MaterialComponents.Dialog.Alert">
+
+
+        <item name="colorAccent">@color/colorAccent</item>
+
+
+    </style>
+    <style
+            name="AppTheme.AppBarOverlay"
+            parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style
+            name="AppTheme.PopupOverlay"
+            parent="ThemeOverlay.AppCompat.Light" />
+    <style
+            name="TabTitleTheme"
+        parent="@android:style/TextAppearance.Widget.TabWidget">
+        <item name="android:letterSpacing">0.1</item>
+
+    </style>
+
+    <style
+            name="ToolbarTitleTheme"
+        parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20.0dip</item>
+        <!-- ><item name="android:textStyle">bold</item> -->
+        <item name="android:textColor">#000000</item>
+        <item name="android:shadowDy">2.0</item>
+        <item name="android:shadowRadius">2.0</item>
+
+    </style>
+
+    <style
+            name="ToolbarSubtitleTheme"
+        parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">10.0dip</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:shadowDy">1.0</item>
+        <item name="android:shadowRadius">1.0</item>
+
+    </style>
+
+    <!-- Toolbar theme -->
+    <style
+            name="ToolbarTheme"
+            parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!-- android:textColorPrimary is the color of the title text in the Toolbar -->
+
+        <item name="android:textColorPrimary">#000000</item>
+        <!-- actionMenuTextColor is the color of the text of action (menu) items -->
+        <item name="actionMenuTextColor">@android:color/holo_green_light</item>
+
+        <!-- Tints the input fields like checkboxes and text fields -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- Applies to views in their normal state. -->
+        <item name="colorControlNormal">#000000</item>
+        <!-- Applies to views in their activated state (i.e checked or switches) -->
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <!-- Applied to framework control highlights (i.e ripples or list selectors) -->
+        <item name="colorControlHighlight">@color/colorPrimary</item>
+
+        <!-- Enable these below if you want clicking icons to trigger a ripple effect -->
+
+        <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+    
+    <!-- Estilo personalizado para TextInputLayout OutlinedBox -->
+    <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/text_input_border_selector</item> <!-- Selector para borde -->
+        <item name="hintTextColor">@color/redph</item> <!-- Rojo para la etiqueta flotante -->
+        <item name="android:textColorHint">@color/silver</item> <!-- Gris claro para el hint no enfocado -->
+        <item name="boxBackgroundColor">@color/starlight</item> <!-- Verde claro como fondo -->
+    </style>
+
+    <style
+        name="Pd"
+        parent="@style/Widget.MaterialComponents.Chip.Action">
+        <item name="android:textSize">15.0sp</item>
+        <item name="android:checkable">false</item>
+        <item name="chipIconSize">15.0dip</item>
+        <item name="chipMinHeight">22.0dip</item>
+        <item name="chipMinTouchTargetSize">0.0dip</item>
+        <item name="iconStartPadding">6.0dip</item>
+    </style>
+
+
+    <style
+            name="MyDialogTheme"
+            parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#AF4A00</item>
+        <item name="android:background">#BCBCBC</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:fontFamily">@font/fugaz_one_font</item>
+    </style>
+
+</resources>

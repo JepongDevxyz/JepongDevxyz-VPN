@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+	
+    <LinearLayout
+        android:orientation="vertical"
+        
+        android:paddingRight="8dp"
+        android:background="@color/card_view_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+		
+        <CheckBox
+            android:id="@+id/activity_config_exportBlockRootCheck"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/check_block_root" 
+            />
+			
+        <CheckBox
+            android:id="@+id/activity_config_exportHdwidLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Inicio de Sesion SSH usando HWID" 
+            />
+			
+        <CheckBox
+            android:id="@+id/activity_config_exportOnlyDataBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bloquear Solo Datos Moviles" 
+            />
+			
+        <CheckBox
+            android:id="@+id/activity_config_exportOnlyPlayStore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bloquear Solo Instalacion de Play Store" 
+            
+/>
+			
+        <CheckBox
+            android:id="@+id/activity_config_exportOperadorCheck"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:text="@string/operator_checkbox_tittle" 
+            />
+			
+        <CheckBox
+            android:id="@+id/activity_config_exportValidadeCheck"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/check_date_valid" 
+            
+/>
+			
+        <CheckBox
+            android:id="@+id/activity_config_exportBlockHwid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/block_hwid_checkbox_tittle" 
+            
+/>
+        
+     
+    </LinearLayout>
+	
+</LinearLayout>

@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="fill_parent"
+     android:layout_width="fill_parent">
+
+    <LinearLayout
+         android:layout_height="wrap_content"
+         android:layout_width="fill_parent"
+         android:focusableInTouchMode="true"
+         android:orientation="vertical"
+         android:focusable="true"
+         android:id="@+id/activity_mainLinearLayout">
+
+        <androidx.appcompat.widget.AppCompatButton
+             android:layout_height="40dp"
+             android:layout_width="fill_parent"
+             android:layout_marginBottom="10.0dip"
+             android:background="@drawable/xz"
+             android:longClickable="false"
+             app:cornerRadius="25dp"
+             android:textColor="@color/button_text_color_m3"
+             android:layout_marginLeft="5.0dip"
+             android:layout_marginRight="5.0dip"
+             android:layout_marginTop="15.0dip"
+             android:id="@+id/activity_starterButtonMain"
+             android:text="@string/start" />
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:visibility="gone"
+             android:layout_margin="5.0dip"
+             android:onClick="seleccionarImagen"
+             app:cardBackgroundColor="#ff4caf50"
+             android:id="@+id/btnSelectImage">
+
+            <RelativeLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:padding="10.0dip">
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:textColor="@color/white"
+                     android:maxLines="1"
+                     android:id="@+id/textView"
+                     android:text="@string/dash_sign" />
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:layout_margin="5.0dip"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/tunnelCardView"
+             android:paddingTop="10.0dip"
+             android:foreground="?android:selectableItemBackground">
+
+            <LinearLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="fill_parent"
+                 android:padding="10.0dip"
+                 android:orientation="horizontal">
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="0.0dip"
+                     app:drawableLeftCompat="@drawable/ic_action_matrix"
+                     android:drawablePadding="5.0dip"
+                     android:ellipsize="end"
+                     android:padding="5.0dip"
+                     android:tint="@color/colorAccent"
+                     app:drawableStartCompat="@drawable/ic_action_matrix"
+                     android:gravity="center_vertical"
+                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                     android:maxLines="1"
+                     android:layout_weight="1.0"
+                     android:id="@+id/activitymainTextView1" />
+
+                <ImageView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:src="@drawable/ic_navigation_chevron_right"
+                     android:gravity="end"
+                     android:tint="@color/colorAccent"
+                     android:layout_gravity="center_vertical" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:layout_margin="5.0dip"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/connection_cardView">
+
+            <LinearLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="fill_parent"
+                 android:padding="10.0dip"
+                 android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="match_parent"
+                     android:hint="@string/payload"
+                     android:layout_marginTop="10dp"
+                     android:id="@+id/payload">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="fill_parent"
+                         android:scrollbars="vertical"
+                         android:layout_below="@id/activity_starterButtonMain"
+                         android:drawableEnd="@drawable/ic_developer_mode_raster"
+                         app:drawableTint="@color/colorAccent"
+                         android:layout_alignParentStart="true"
+                         android:id="@+id/payloadEdit" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:visibility="gone"
+                     android:hint="@string/payload"
+                     android:id="@+id/inputLayoutPayloadDefault">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                         android:layout_height="wrap_content"
+                         android:layout_width="fill_parent"
+                         android:layout_below="@id/activity_starterButtonMain"
+                         android:enabled="false"
+                         android:layout_alignParentStart="true"
+                         android:text="@string/default_payload" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:weightSum="1.0"
+                     android:orientation="horizontal"
+                     android:baselineAligned="false"
+                     android:layout_marginTop="10.0dip"
+                     android:id="@+id/proxyLayout"
+                     android:foreground="?android:selectableItemBackground">
+
+                    <LinearLayout
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:orientation="vertical"
+                         android:layout_weight="0.9">
+
+                        <TextView
+                             android:layout_height="wrap_content"
+                             android:layout_width="fill_parent"
+                             android:paddingEnd="5.0dip"
+                             android:paddingStart="5.0dip"
+                             android:maxLines="1"
+                             android:text="@string/remote_proxy" />
+
+                        <TextView
+                             android:layout_height="wrap_content"
+                             android:layout_width="fill_parent"
+                             android:paddingEnd="5.0dip"
+                             android:paddingStart="5.0dip"
+                             android:maxLines="1"
+                             android:id="@+id/proxyText"
+                             android:text="@string/censored_string" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:src="@drawable/ic_editor_mode_edit"
+                         android:tint="@color/colorAccent"
+                         android:layout_weight="0.1"
+                         android:layout_gravity="center_vertical"
+                         android:id="@+id/imageViewProxy" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:weightSum="1.0"
+                     android:visibility="gone"
+                     android:orientation="horizontal"
+                     android:baselineAligned="false"
+                     android:layout_marginTop="5.0dip"
+                     android:id="@+id/httpObfsLayout"
+                     android:foreground="?android:selectableItemBackground">
+
+                    <LinearLayout
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:orientation="vertical"
+                         android:layout_weight="0.9">
+
+                        <TextView
+                             android:layout_height="wrap_content"
+                             android:layout_width="fill_parent"
+                             android:paddingEnd="5.0dip"
+                             android:paddingStart="5.0dip"
+                             android:maxLines="1"
+                             android:textStyle="bold"
+                             android:id="@+id/textViewHttpTitle"
+                             android:text="@string/settings" />
+
+                        <TextView
+                             android:layout_height="wrap_content"
+                             android:layout_width="fill_parent"
+                             android:paddingEnd="5.0dip"
+                             android:ellipsize="end"
+                             android:textColor="@color/text_black"
+                             android:paddingStart="5.0dip"
+                             android:maxLines="3"
+                             android:id="@+id/textViewHttpObfs"
+                             android:text="@string/censored_string" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:src="@drawable/ic_editor_mode_edit"
+                         android:tint="@color/colorAccent"
+                         android:layout_weight="0.1"
+                         android:layout_gravity="center_vertical"
+                         android:id="@+id/imageViewHttpObfs" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:weightSum="1.0"
+                     android:orientation="horizontal"
+                     android:baselineAligned="false"
+                     android:layout_marginTop="5.0dip"
+                     android:id="@+id/sslLayout"
+                     android:foreground="?android:selectableItemBackground">
+
+                    <LinearLayout
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:orientation="vertical"
+                         android:layout_weight="0.9">
+
+                        <TextView
+                             android:layout_height="wrap_content"
+                             android:layout_width="fill_parent"
+                             android:paddingEnd="5.0dip"
+                             android:paddingStart="5.0dip"
+                             android:maxLines="1"
+                             android:textStyle="bold"
+                             android:id="@+id/textViewSniTitle"
+                             android:text="@string/sni_title" />
+
+                        <TextView
+                             android:layout_height="wrap_content"
+                             android:layout_width="fill_parent"
+                             android:paddingEnd="5.0dip"
+                             android:paddingStart="5.0dip"
+                             android:maxLines="1"
+                             android:id="@+id/sslText"
+                             android:text="@string/censored_string" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:src="@drawable/ic_editor_mode_edit"
+                         android:tint="@color/colorAccent"
+                         android:layout_weight="0.1"
+                         android:layout_gravity="center_vertical"
+                         android:id="@+id/imageViewSNI" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                     android:layout_height="wrap_content"
+                     android:layout_width="fill_parent"
+                     android:visibility="gone"
+                     android:weightSum="1.0"
+                     android:baselineAligned="false"
+                     android:layout_marginTop="5.0dip"
+                     android:id="@+id/serverLayout"
+                     android:foreground="?android:selectableItemBackground">
+
+                    <TextView
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:drawablePadding="5.0dip"
+                         app:drawableStartCompat="@drawable/ic_location"
+                         android:gravity="center_vertical"
+                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                         android:ellipsize="end"
+                         android:padding="5.0dip"
+                         android:drawableStart="@drawable/ic_location"
+                         android:maxLines="2"
+                         android:layout_weight="0.9"
+                         android:id="@+id/textViewServer" />
+
+                    <LinearLayout
+                         android:layout_height="wrap_content"
+                         android:layout_width="0.0dip"
+                         android:layout_weight="0.1"
+                         android:layout_gravity="center_vertical">
+
+                        <ImageView
+                             android:layout_height="10.0dip"
+                             android:layout_width="10.0dip"
+                             android:background="@drawable/ic_circle_dot"
+                             android:layout_marginStart="6.0dip"
+                             android:layout_gravity="center_vertical"
+                             android:id="@+id/imageServerLoad" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                         android:layout_height="wrap_content"
+                         android:layout_width="wrap_content"
+                         android:src="@drawable/ic_navigation_chevron_right"
+                         android:gravity="end"
+                         android:tint="@color/colorAccent"
+                         android:layout_gravity="center_vertical" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:layout_margin="5.0dip"
+             android:onClick="hype"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/cardViewNews"
+             android:paddingTop="10.0dip"
+             android:foreground="?android:selectableItemBackground">
+
+            <LinearLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:orientation="horizontal">
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     app:drawableLeftCompat="@drawable/ic_action_newspaper"
+                     android:drawablePadding="5.0dip"
+                     android:linksClickable="true"
+                     android:ellipsize="end"
+                     android:padding="5.0dip"
+                     android:tint="@color/colorAccent"
+                     android:autoLink="web"
+                     app:drawableStartCompat="@drawable/ic_action_newspaper"
+                     android:gravity="center_vertical"
+                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                     android:maxLines="1"
+                     android:text="Join us on Telegram"
+                     android:id="@+id/newsTitle" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:orientation="horizontal"
+             android:id="@+id/controlMenuLayout">
+
+        </RelativeLayout>
+
+        <com.google.android.gms.ads.AdView
+             xmlns:ads="http://schemas.android.com/apk/res-auto"
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             ads:adSize="BANNER"
+             ads:adUnitId="ca-app-pub-3940256099942544/6300970000"
+             android:layout_centerHorizontal="true"
+             android:layout_marginTop="8dp"
+             android:layout_alignParentBottom="true"
+             android:id="@+id/adView1"
+             android:layout_gravity="center" />
+
+        <FrameLayout
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:layout_marginTop="10.0dip"
+             android:layout_gravity="center"
+             android:id="@+id/admobAdViewContainer">
+
+        </FrameLayout>
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:visibility="gone"
+             android:layout_marginBottom="8.0dip"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/cardViewAds">
+
+            <FrameLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="fill_parent"
+                 android:id="@+id/admob_native_ad_container">
+
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:visibility="gone"
+             android:layout_marginBottom="10.0dip"
+             android:layout_margin="5.0dip"
+             app:cardBackgroundColor="@color/card_view_bg"
+             app:cardCornerRadius="2.0dip"
+             android:id="@+id/activitymainCardView1"
+             android:paddingTop="10.0dip">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:autoLink="web"
+                 android:linksClickable="true"
+                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                 android:padding="5.0dip"
+                 android:textIsSelectable="true"
+                 android:id="@+id/activity_mainMensagemConfigTextView" />
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         android:visibility="gone"
+         android:layout_marginBottom="40dp"
+         android:src="@drawable/help"
+         app:tint="@color/fabColor"
+         app:drawableTint="@color/fabColor"
+         android:backgroundTint="@color/container"
+         android:layout_marginRight="15dp"
+         android:layout_alignParentRight="true"
+         android:layout_alignParentBottom="true"
+         android:id="@+id/info" />
+
+</RelativeLayout>
