@@ -140,7 +140,7 @@ jobs:
         shell: bash
         run: bash /tmp/v13-scripts/03-patches.sh
 
-      - name: Apply proven runtime theme fix
+      - name: Apply runtime compatibility fixes
         shell: bash
         run: |
           set -euo pipefail
@@ -148,132 +148,28 @@ jobs:
           import os
           from pathlib import Path
           root = Path(os.environ['PROJECT_DIR'])
-          p = root / 'res/layout/activity_about.xml'
-          text = p.read_text(encoding='utf-8')
+
+          about = root / 'res/layout/activity_about.xml'
+          text = about.read_text(encoding='utf-8')
           old = 'android:background="?selectableItemBackground"'
           new = 'android:background="?android:attr/selectableItemBackground"'
           count = text.count(old)
           if count < 1:
               raise SystemExit('activity_about.xml: known failing selectableItemBackground pattern not found')
-          p.write_text(text.replace(old, new), encoding='utf-8')
+          about.write_text(text.replace(old, new), encoding='utf-8')
           print(f'RUNTIME_THEME_FIX_COUNT={count}')
-          fixed = p.read_text(encoding='utf-8')
-          if old in fixed or new not in fixed:
-              raise SystemExit('Runtime theme fix verification failed')
+
+          nav = root / 'src/com/google/android/material/navigation/NavigationView.java'
+          nav_text = nav.read_text(encoding='utf-8')
+          nav_old = ' public NavigationView(Context c){super(c);} public NavigationView(Context c,AttributeSet a){super(c,a);} public NavigationView(Context c,AttributeSet a,int s){super(c,a,s);}'
+          nav_new = ' public NavigationView(Context c){super(c);} public NavigationView(Context c,AttributeSet a){super(c,a);init(c,a);} public NavigationView(Context c,AttributeSet a,int s){super(c,a,s);init(c,a);} private void init(Context c,AttributeSet a){if(a==null)return;int r=a.getAttributeResourceValue("http://schemas.android.com/apk/res-auto","headerLayout",0);if(r!=0){android.view.View v=android.view.LayoutInflater.from(c).inflate(r,this,false);addView(v);}}'
+          if nav_old not in nav_text:
+              raise SystemExit('NavigationView constructor shim pattern not found')
+          nav.write_text(nav_text.replace(nav_old, nav_new, 1), encoding='utf-8')
+          print('NAVIGATION_HEADER_FIX=APPLIED')
           PY
           grep -q 'android:background="?android:attr/selectableItemBackground"' "$PROJECT_DIR/res/layout/activity_about.xml"
-
-      - name: Fix NavigationView header inflation compatibility
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-          p = Path(os.environ['PROJECT_DIR']) / 'src/com/google/android/material/navigation/NavigationView.java'
-          p.write_text(r'''package com.google.android.material.navigation;
-
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
-import android.widget.FrameLayout;
-
-public class NavigationView extends FrameLayout {
-  private static final String AUTO_NS = "http://schemas.android.com/apk/res-auto";
-
-  public interface OnNavigationItemSelectedListener {
-    boolean onNavigationItemSelected(MenuItem item);
-  }
-
-  private OnNavigationItemSelectedListener listener;
-  private View headerView;
-  private final Menu menu = new SimpleMenu();
-
-  public NavigationView(Context context) {
-    super(context);
-    init(context, null);
-  }
-
-  public NavigationView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init(context, attrs);
-  }
-
-  public NavigationView(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    init(context, attrs);
-  }
-
-  private void init(Context context, AttributeSet attrs) {
-    if (attrs == null) return;
-    int headerLayout = attrs.getAttributeResourceValue(AUTO_NS, "headerLayout", 0);
-    if (headerLayout != 0) {
-      inflateHeaderView(headerLayout);
-    }
-  }
-
-  public View inflateHeaderView(int resId) {
-    if (headerView != null) {
-      removeView(headerView);
-    }
-    headerView = LayoutInflater.from(getContext()).inflate(resId, this, false);
-    addView(headerView);
-    return headerView;
-  }
-
-  public View getHeaderView(int index) {
-    if (index == 0 && headerView != null) return headerView;
-    if (index >= 0 && index < getChildCount()) return getChildAt(index);
-    return this;
-  }
-
-  public int getHeaderCount() {
-    return headerView == null ? 0 : 1;
-  }
-
-  public void setNavigationItemSelectedListener(OnNavigationItemSelectedListener value) {
-    listener = value;
-  }
-
-  public Menu getMenu() {
-    return menu;
-  }
-
-  static class SimpleMenu implements Menu {
-    public MenuItem add(CharSequence t){return null;}
-    public MenuItem add(int t){return null;}
-    public MenuItem add(int g,int i,int o,CharSequence t){return null;}
-    public MenuItem add(int g,int i,int o,int t){return null;}
-    public SubMenu addSubMenu(CharSequence t){return null;}
-    public SubMenu addSubMenu(int t){return null;}
-    public SubMenu addSubMenu(int g,int i,int o,CharSequence t){return null;}
-    public SubMenu addSubMenu(int g,int i,int o,int t){return null;}
-    public int addIntentOptions(int g,int i,int o,android.content.ComponentName c,android.content.Intent[] s,android.content.Intent in,int f,MenuItem[] out){return 0;}
-    public void removeItem(int i){}
-    public void removeGroup(int g){}
-    public void clear(){}
-    public void setGroupCheckable(int g,boolean c,boolean e){}
-    public void setGroupVisible(int g,boolean v){}
-    public void setGroupEnabled(int g,boolean e){}
-    public boolean hasVisibleItems(){return false;}
-    public MenuItem findItem(int id){return null;}
-    public int size(){return 0;}
-    public MenuItem getItem(int i){return null;}
-    public void close(){}
-    public boolean performShortcut(int k,android.view.KeyEvent e,int f){return false;}
-    public boolean isShortcutKey(int k,android.view.KeyEvent e){return false;}
-    public boolean performIdentifierAction(int i,int f){return false;}
-    public void setQwertyMode(boolean q){}
-  }
-}
-''', encoding='utf-8')
-          PY
-          grep -q 'inflateHeaderView(headerLayout)' "$PROJECT_DIR/src/com/google/android/material/navigation/NavigationView.java"
-          grep -q 'getAttributeResourceValue(AUTO_NS, "headerLayout", 0)' "$PROJECT_DIR/src/com/google/android/material/navigation/NavigationView.java"
+          grep -q 'getAttributeResourceValue("http://schemas.android.com/apk/res-auto","headerLayout",0)' "$PROJECT_DIR/src/com/google/android/material/navigation/NavigationView.java"
 
       - name: Fresh AAPT resource compile and regenerate R
         shell: bash
@@ -312,10 +208,9 @@ public class NavigationView extends FrameLayout {
           if [[ -f "$PROJECT_DIR/build/logcat.txt" ]]; then
             grep -A100 -B10 'FATAL EXCEPTION' "$PROJECT_DIR/build/logcat.txt" | head -n 240 || true
           fi
-          echo '=== activity_about selectable backgrounds ==='
+          echo '=== runtime fixes ==='
           grep -n 'selectableItemBackground' "$PROJECT_DIR/res/layout/activity_about.xml" || true
-          echo '=== NavigationView header compatibility ==='
-          grep -n -E 'headerLayout|inflateHeaderView|getHeaderView' "$PROJECT_DIR/src/com/google/android/material/navigation/NavigationView.java" || true
+          grep -n -E 'headerLayout|getHeaderView' "$PROJECT_DIR/src/com/google/android/material/navigation/NavigationView.java" || true
           echo '=== launch.txt ==='
           cat "$PROJECT_DIR/build/launch.txt" || true
           echo '=== adb-install.txt ==='
