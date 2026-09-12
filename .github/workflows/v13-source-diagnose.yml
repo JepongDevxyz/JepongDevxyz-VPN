@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: aide-v13-fresh-build-verify
-      - name: Download exact V13 and inspect crash line
+      - name: Download exact V13 and inspect NavigationView usage
         shell: bash
         run: |
           set -euo pipefail
@@ -30,32 +30,17 @@ jobs:
           mkdir -p /tmp/v13diag
           unzip -q /tmp/v13diag.zip -d /tmp/v13diag
           MAIN="$(find /tmp/v13diag -type f -path '*/src/com/jepongdevxyz/vpn/MainActivity.java' -print -quit)"
-          test -n "$MAIN"
-          echo "MAIN=$MAIN"
+          NAVSRC="$(find /tmp/v13diag -type f -path '*/src/com/google/android/material/navigation/NavigationView.java' -print -quit)"
+          NAVXML="$(find /tmp/v13diag -type f -path '*/res/layout/nav_header.xml' -print -quit)"
+          test -n "$MAIN"; test -n "$NAVSRC"; test -n "$NAVXML"
           echo '=== MainActivity.java 810-855 ==='
           nl -ba "$MAIN" | sed -n '810,855p'
-          echo '=== findViewById near doDrawerMain ==='
-          sed -n '760,870p' "$MAIN" | grep -n -E 'findViewById|setText|doDrawerMain|TextView' || true
-          echo '=== candidate IDs in resources ==='
-          IDS=$(sed -n '810,855p' "$MAIN" | grep -oE 'R\.id\.[A-Za-z0-9_]+' | sed 's/R\.id\.//' | sort -u || true)
-          printf '%s\n' "$IDS"
-          for id in $IDS; do
-            echo "--- ID: $id ---"
-            grep -R -n --include='*.xml' -E "@\+?id/$id([\"'[:space:]>]|$)" /tmp/v13diag | head -n 20 || true
-          done
+          echo '=== NavigationView shim ==='
+          nl -ba "$NAVSRC" | sed -n '1,260p'
           echo '=== nav_header.xml ==='
-          NAV=$(find /tmp/v13diag -type f -path '*/res/layout/nav_header.xml' -print -quit)
-          test -n "$NAV"
-          nl -ba "$NAV" | sed -n '1,140p'
-          echo '=== activity_main_drawer NavigationView area ==='
-          DRAWER=$(find /tmp/v13diag -type f -path '*/res/layout/activity_main_drawer.xml' -print -quit)
-          test -n "$DRAWER"
-          nl -ba "$DRAWER" | sed -n '95,120p'
-          echo '=== NavigationView source candidates ==='
-          find /tmp/v13diag -type f \( -name 'NavigationView.java' -o -name '*NavigationView*.java' \) -print
-          while IFS= read -r f; do
-            echo "--- $f ---"
-            nl -ba "$f" | sed -n '1,260p'
-          done < <(find /tmp/v13diag -type f \( -name 'NavigationView.java' -o -name '*NavigationView*.java' \) -print)
-          echo '=== headerLayout/getHeaderView references ==='
-          grep -R -n --include='*.java' -E 'getHeaderView|headerLayout|inflateHeaderView' /tmp/v13diag | head -n 120 || true
+          nl -ba "$NAVXML" | sed -n '1,140p'
+          echo '=== all NavigationView / drawerNavigationView usages ==='
+          grep -R -n --include='*.java' -E 'drawerNavigationView|NavigationView|\.getMenu\(\)|getHeaderView\(|inflateHeaderView\(' /tmp/v13diag | head -n 300 || true
+          echo '=== navigation menu XML ==='
+          MENU="$(find /tmp/v13diag -type f -path '*/res/menu/navigation_menu.xml' -print -quit)"
+          if [[ -n "$MENU" ]]; then nl -ba "$MENU" | sed -n '1,260p'; fi
