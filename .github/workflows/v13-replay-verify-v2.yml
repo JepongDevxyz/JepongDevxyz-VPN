@@ -73,6 +73,27 @@ jobs:
                   script = step.get('with', {}).get('script')
                   if not isinstance(script, str) or 'adb install -r' not in script:
                       raise SystemExit('Canonical emulator script missing adb install')
+                  old = 'adb install -r "$APK" 2>&1 | tee build/adb-install.txt'
+                  hardened = '''adb wait-for-device
+          PACKAGE_READY=0
+          for attempt in $(seq 1 60); do
+            if adb shell service check package 2>/dev/null | tr -d '\\r' | grep -q 'found'; then
+              if adb shell pm path android >/dev/null 2>&1; then
+                PACKAGE_READY=1
+                break
+              fi
+            fi
+            sleep 2
+          done
+          if [ "$PACKAGE_READY" -ne 1 ]; then
+            echo 'Package Manager did not become healthy' | tee build/package-service.txt
+            exit 1
+          fi
+          adb shell service check package 2>&1 | tee build/package-service.txt
+          adb install -r --no-incremental --no-streaming "$APK" 2>&1 | tee build/adb-install.txt'''
+                  if old not in script:
+                      raise SystemExit('Canonical adb install line changed unexpectedly')
+                  script = script.replace(old, hardened, 1)
                   (out / '08-emulator.sh').write_text(script + '\n', encoding='utf-8')
                   found.add(name)
           expected = set(wanted) | {'Install and launch on Android 11 API 30 emulator'}
@@ -80,7 +101,8 @@ jobs:
           if missing:
               raise SystemExit('Missing canonical steps: ' + ', '.join(sorted(missing)))
           PY
-          grep -q 'adb install -r' /tmp/v13-scripts/08-emulator.sh
+          grep -q -- '--no-incremental --no-streaming' /tmp/v13-scripts/08-emulator.sh
+          grep -q 'service check package' /tmp/v13-scripts/08-emulator.sh
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -90,6 +112,20 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Enable KVM access for emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+            test -r /dev/kvm
+            test -w /dev/kvm
+            ls -l /dev/kvm
+            echo 'KVM_ACCESS=PASS'
+          else
+            echo 'KVM_ACCESS=UNAVAILABLE; emulator runner may use software acceleration'
+          fi
 
       - name: Install Android 30 build toolchain
         shell: bash
@@ -129,7 +165,7 @@ jobs:
           arch: x86_64
           profile: pixel_2
           disable-animations: false
-          emulator-options: -no-window -no-snapshot-save -noaudio -no-boot-anim -gpu swiftshader_indirect
+          emulator-options: -no-window -no-snapshot-save -noaudio -no-boot-anim -no-metrics -gpu swiftshader_indirect
           script: bash /tmp/v13-scripts/08-emulator.sh
 
       - name: Write and require final verification evidence
@@ -159,6 +195,7 @@ jobs:
             ${{ env.PROJECT_DIR }}/build/dx.log
             ${{ env.PROJECT_DIR }}/build/apksigner.log
             ${{ env.PROJECT_DIR }}/build/badging.txt
+            ${{ env.PROJECT_DIR }}/build/package-service.txt
             ${{ env.PROJECT_DIR }}/build/adb-install.txt
             ${{ env.PROJECT_DIR }}/build/pm-path.txt
             ${{ env.PROJECT_DIR }}/build/launch.txt
